@@ -4,8 +4,8 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { TransactionComponent } from './transaction/transaction.component';
-import { TransactionsListComponent } from './transactions-list/transactions-list.component';
+import { TransactionComponent } from '@app/components/transaction/transaction.component';
+import { TransactionsListComponent } from '@app/components/transactions-list/transactions-list.component';
 
 @NgModule({
   declarations: [

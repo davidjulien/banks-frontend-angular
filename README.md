@@ -1,4 +1,4 @@
-BanksFrontendAngular
+BanksFrontendAngular [![Build Status](https://travis-ci.com/davidjulien/banks-frontend-angular.svg?branch=master)](https://travis-ci.com/davidjulien/banks-frontend-angular)
 --------------------
 
 An angular frontend to visualize transactions and analyze them. Transactions are fetched by [banks_fetch](https://github.com/davidjulien/banks_fetch).

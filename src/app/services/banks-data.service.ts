@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from "rxjs/operators";
+import { map } from 'rxjs/operators';
 
 import { Transaction, TransactionAdapter } from '../models/transaction.model';
 import { TransactionsPage, TransactionsPageAdapter } from '../models/transactions-page.model';
@@ -16,7 +16,7 @@ export class BanksDataService {
 
   getTransactionsPage(): Observable<TransactionsPage> {
     return this.http.get<TransactionsPage>(`${this.API_URL}/transactions.json`).pipe(
-      map((item : any) => this.adapter.adapt(item) ) // Adapt api result to our data model
+      map((item: any) => this.adapter.adapt(item) ) // Adapt api result to our data model
     );
   }
 }

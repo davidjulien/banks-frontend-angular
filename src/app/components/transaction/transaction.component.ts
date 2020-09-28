@@ -7,7 +7,7 @@ import { Transaction } from '@app/models/transaction.model';
   styleUrls: ['./transaction.component.scss']
 })
 export class TransactionComponent implements OnInit {
-  _transaction: Transaction;
+  pTransaction: Transaction;
 
   constructor() { }
 
@@ -16,9 +16,9 @@ export class TransactionComponent implements OnInit {
 
   @Input()
   set transaction(transaction: Transaction) {
-    this._transaction = transaction;
+    this.pTransaction = transaction;
   }
   get transaction(): Transaction {
-    return this._transaction;
+    return this.pTransaction;
   }
 }

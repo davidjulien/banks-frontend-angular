@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import { Adapter } from '../adapter';
 
 export class Bank {
@@ -7,7 +7,7 @@ export class Bank {
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class BankAdapter implements Adapter<Bank> {
   adapt(item: any): Bank {

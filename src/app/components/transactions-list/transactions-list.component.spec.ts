@@ -5,15 +5,19 @@ import { By } from '@angular/platform-browser';
 import { Bank } from '@app/models/bank.model';
 import { Transaction, TransactionType } from '@app/models/transaction.model';
 import { TransactionsPage } from '@app/models/transactions-page.model';
-import { BanksDataService } from '@app/services/banks-data.service';
+
 import { TransactionsListComponent } from './transactions-list.component';
 import { TransactionComponent } from '@app/components/transaction/transaction.component';
+
+import { BanksDataService } from '@app/services/banks-data.service';
 
 // Date month starts at 0...
 const TRANSACTIONS_PAGE = new TransactionsPage(
   [
-    new Transaction(1, new Bank("ing", "ING"), "CLIENT", "ACCOUNT", new Date(Date.UTC(2020,8,24,12,0,0)), "TRANSACTION1", new Date(Date.UTC(2020,8,24)), new Date(Date.UTC(2020,8,24)), -123.45, "PAIEMENT PAR CARTE", TransactionType.SEPA_DEBIT),
-    new Transaction(2, new Bank("ing", "ING"), "CLIENT", "ACCOUNT", new Date(Date.UTC(2020,8,24,12,0,0)), "TRANSACTION2", new Date(Date.UTC(2020,8,23)), new Date(Date.UTC(2020,8,23)), 56.78, "VIREMENT", TransactionType.TRANSFER)
+    new Transaction(1, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', new Date(Date.UTC(2020, 8, 24, 12, 0, 0)), 'TRANSACTION1',
+      new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT),
+    new Transaction(2, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', new Date(Date.UTC(2020, 8, 24, 12, 0, 0)), 'TRANSACTION2',
+      new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), 56.78, 'VIREMENT', TransactionType.TRANSFER)
   ]);
 
 

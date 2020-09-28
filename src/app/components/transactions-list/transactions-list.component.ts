@@ -11,7 +11,7 @@ import { BanksDataService } from '@app/services/banks-data.service';
 export class TransactionsListComponent implements OnInit {
   public transactions: Transaction[];
 
-  constructor(private banksDataService: BanksDataService) { 
+  constructor(private banksDataService: BanksDataService) {
     this.transactions = [];
   }
 

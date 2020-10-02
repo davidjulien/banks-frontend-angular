@@ -14,9 +14,9 @@ import { BanksDataService } from '@app/services/banks-data.service';
 // Date month starts at 0...
 const TRANSACTIONS_PAGE = new TransactionsPage(
   [
-    new Transaction(1, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', new Date(Date.UTC(2020, 8, 24, 12, 0, 0)), 'TRANSACTION1',
+    new Transaction(1, 'ing', 'CLIENT', 'ACCOUNT', 'TRANSACTION1',
       new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT),
-    new Transaction(2, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', new Date(Date.UTC(2020, 8, 24, 12, 0, 0)), 'TRANSACTION2',
+    new Transaction(2, 'ing', 'CLIENT', 'ACCOUNT', 'TRANSACTION2',
       new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), 56.78, 'VIREMENT', TransactionType.TRANSFER)
   ]);
 

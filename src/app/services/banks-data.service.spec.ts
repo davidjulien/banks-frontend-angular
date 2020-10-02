@@ -5,20 +5,23 @@ import { HttpTestingController, HttpClientTestingModule } from '@angular/common/
 import { BanksDataService } from '@app/services/banks-data.service';
 import { Transaction, TransactionType } from '@app/models/transaction.model';
 import { TransactionsPage } from '@app/models/transactions-page.model';
-import { Bank } from '@app/models/bank.model';
+import { Bank, BankAdapter } from '@app/models/bank.model';
 
 const TRANSACTIONS_DATA = {
   transactions: [
-    {id: 1, bank: {id: 'ing', name: 'ING'}, clientId: 'CLIENT', accountId: 'ACCOUNT', fetchingAt: '2020-09-24T12:00:00Z', transactionId: 'TRANSACTION', accountingDate: '2020-09-24', effectiveDate: '2020-09-24',
-      amount: -123.45, description: 'PAIEMENT PAR CARTE', transactionType: 'SEPA_DEBIT'}
+    {id: 1, bank_id: 'ing', client_id: 'CLIENT', account_id: 'ACCOUNT', transaction_id: 'TRANSACTION', accounting_date: '2020-09-24', effective_date: '2020-09-24',
+      amount: -123.45, description: 'PAIEMENT PAR CARTE', transaction_type: 'SEPA_DEBIT'}
   ]
 };
 // Date month starts at 0...
 const TRANSACTIONS_DATA_EXPECTED = new TransactionsPage(
   [
-    new Transaction(1, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', new Date(Date.UTC(2020, 8, 24, 12, 0, 0)), 'TRANSACTION',
+    new Transaction(1, 'ing', 'CLIENT', 'ACCOUNT', 'TRANSACTION',
       new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT)
   ]);
+
+const BANKS_DATA = [ {id: 'ing', name: 'ING'} ];
+const BANKS_DATA_EXPECTED = [ new Bank('ing', 'ING') ];
 
 describe('BanksDataService', () => {
   let service: BanksDataService;
@@ -47,9 +50,21 @@ describe('BanksDataService', () => {
     service.getTransactionsPage().subscribe((data: TransactionsPage) => {
       expect(data).toEqual(TRANSACTIONS_DATA_EXPECTED);
     });
-    const request = httpMock.expectOne(`${service.API_URL}/transactions.json`);
+    const request = httpMock.expectOne(`${service.API_URL}/transactions`);
     expect(request.request.method).toBe('GET');
     request.flush(TRANSACTIONS_DATA);
   });
+
+  it('should returns all banks', () => {
+    expect(service).toBeTruthy();
+
+    service.getBanks().subscribe((data: Bank[]) => {
+      expect(data).toEqual(BANKS_DATA_EXPECTED);
+    });
+    const request = httpMock.expectOne(`${service.API_URL}/banks`);
+    expect(request.request.method).toBe('GET');
+    request.flush(BANKS_DATA);
+  });
+
 
 });

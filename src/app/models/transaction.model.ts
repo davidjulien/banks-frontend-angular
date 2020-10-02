@@ -14,10 +14,9 @@ export enum TransactionType {
 export class Transaction {
   constructor(
     public readonly id: number,
-    public readonly bank: Bank,
+    public readonly bankId: string,
     public readonly clientId: string,
     public readonly accountId: string,
-    public readonly fetchingAt: Date,
     public readonly transactionId: string,
     public readonly accountingDate: Date,
     public readonly effectiveDate: Date,
@@ -34,8 +33,8 @@ export class TransactionAdapter implements Adapter<Transaction> {
   constructor(private bankAdapter: BankAdapter) { }
 
   adapt(item: any): Transaction {
-    return new Transaction(item.id, this.bankAdapter.adapt(item.bank), item.clientId, item.accountId,
-      new Date(item.fetchingAt), item.transactionId, new Date(item.accountingDate), new Date(item.effectiveDate),
-      item.amount, item.description, TransactionType[item.transactionType as keyof typeof TransactionType]);
+    return new Transaction(item.id, item.bank_id, item.client_id, item.account_id,
+      item.transaction_id, new Date(item.accounting_date), new Date(item.effective_date),
+      item.amount, item.description, TransactionType[item.transaction_type as keyof typeof TransactionType]);
   }
 }

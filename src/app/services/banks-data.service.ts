@@ -23,7 +23,7 @@ export class BanksDataService {
 
   getBanks(): Observable<Bank[]> {
     return this.http.get<Bank[]>(`${this.API_URL}/banks`).pipe(
-      map((item: Object[]) => item.map((subItem: any) => this.bankAdapter.adapt(subItem)) ) // Adapt api result to our data model
+      map((item: any[]) => item.map((subItem: any) => this.bankAdapter.adapt(subItem)) ) // Adapt api result to our data model
     );
   }
 

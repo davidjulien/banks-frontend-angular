@@ -9,7 +9,8 @@ import { Bank, BankAdapter } from '@app/models/bank.model';
 
 const TRANSACTIONS_DATA = {
   transactions: [
-    {id: 1, bank_id: 'ing', client_id: 'CLIENT', account_id: 'ACCOUNT', transaction_id: 'TRANSACTION', accounting_date: '2020-09-24', effective_date: '2020-09-24',
+    {id: 1, bank_id: 'ing', client_id: 'CLIENT', account_id: 'ACCOUNT', transaction_id: 'TRANSACTION',
+      accounting_date: '2020-09-24', effective_date: '2020-09-24',
       amount: -123.45, description: 'PAIEMENT PAR CARTE', transaction_type: 'SEPA_DEBIT'}
   ]
 };

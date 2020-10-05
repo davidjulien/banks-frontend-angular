@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Transaction, TransactionAdapter } from '../models/transaction.model';
@@ -21,8 +21,11 @@ export class BanksDataService {
     private transactionAdapter: TransactionsPageAdapter) { }
 
   getTransactionsPage(): Observable<TransactionsPage> {
-    return this.http.get<TransactionsPage>(`${this.API_URL}/transactions`).pipe(
-      map((item: any) => this.transactionAdapter.adapt(item) ) // Adapt api result to our data model
+    return forkJoin(
+      this.getBanks(),
+      this.http.get<TransactionsPage>(`${this.API_URL}/transactions`)
+    ).pipe(map(([allBanks, transactions]) =>
+      this.transactionAdapter.adapt(transactions, allBanks) ) // Adapt api result to our data model
     );
   }
 

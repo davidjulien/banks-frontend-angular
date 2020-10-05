@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Adapter } from '../adapter';
 import { Transaction, TransactionAdapter } from './transaction.model';
+import { Bank } from './bank.model';
 
 export class TransactionsPage {
   constructor(public readonly transactions: Transaction[]) {
@@ -10,10 +11,10 @@ export class TransactionsPage {
 @Injectable({
   providedIn: 'root',
 })
-export class TransactionsPageAdapter implements Adapter<TransactionsPage> {
+export class TransactionsPageAdapter {
   constructor(private transactionAdapter: TransactionAdapter) { }
 
-  adapt(item: any): TransactionsPage {
-    return new TransactionsPage(item.transactions.map((subitem) => this.transactionAdapter.adapt(subitem)));
+  adapt(item: any, allBanks: Bank[]): TransactionsPage {
+    return new TransactionsPage(item.transactions.map((subitem) => this.transactionAdapter.adapt(subitem, allBanks)));
   }
 }

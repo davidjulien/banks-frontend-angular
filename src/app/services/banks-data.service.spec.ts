@@ -5,13 +5,14 @@ import { HttpTestingController, HttpClientTestingModule } from '@angular/common/
 import { BanksDataService } from '@app/services/banks-data.service';
 import { Transaction, TransactionType } from '@app/models/transaction.model';
 import { TransactionsPage } from '@app/models/transactions-page.model';
-import { Bank, BankAdapter } from '@app/models/bank.model';
+import { Bank } from '@app/models/bank.model';
+import { Account, AccountOwnership, AccountType } from '@app/models/account.model';
 
 const TRANSACTIONS_DATA = {
   transactions: [
     {id: 1, bank_id: 'ing', client_id: 'CLIENT', account_id: 'ACCOUNT', transaction_id: 'TRANSACTION',
       accounting_date: '2020-09-24', effective_date: '2020-09-24',
-      amount: -123.45, description: 'PAIEMENT PAR CARTE', transaction_type: 'SEPA_DEBIT'}
+      amount: -123.45, description: 'PAIEMENT PAR CARTE', transaction_type: 'sepa_debit'}
   ]
 };
 // Date month starts at 0...
@@ -23,6 +24,14 @@ const TRANSACTIONS_DATA_EXPECTED = new TransactionsPage(
 
 const BANKS_DATA = [ {id: 'ing', name: 'ING'} ];
 const BANKS_DATA_EXPECTED = [ new Bank('ing', 'ING') ];
+
+const ACCOUNTS_DATA = JSON.parse('[{"type":"savings","ownership":"single","owner":"owner1","number":"number1","name":"livret1","id":"account1","balance":6044.09},{"type":"current","ownership":"joint","owner":"owner2","number":"number2","name":"Compte Courant","id":"account2","balance":6317.64},{"type":"home_loan","ownership":"joint","owner":"owner3","number":"number3","name":"Crédit Immobilier","id":"account3","balance":88064.58}]');
+const ACCOUNTS_DATA_EXPECTED = [
+  new Account(undefined, undefined, 'account1', 6044.09, 'number1', 'owner1', AccountOwnership.SINGLE, AccountType.SAVINGS, 'livret1'),
+  new Account(undefined, undefined, 'account2', 6317.64, 'number2', 'owner2', AccountOwnership.JOINT, AccountType.CURRENT, 'Compte Courant'),
+  new Account(undefined, undefined, 'account3', 88064.58, 'number3', 'owner3', AccountOwnership.JOINT, AccountType.HOME_LOAN, 'Crédit Immobilier')
+];
+
 
 describe('BanksDataService', () => {
   let service: BanksDataService;
@@ -67,5 +76,15 @@ describe('BanksDataService', () => {
     request.flush(BANKS_DATA);
   });
 
+  it('should returns all accounts', () => {
+    expect(service).toBeTruthy();
+
+    service.getAccounts().subscribe((data: Account[]) => {
+      expect(data).toEqual(ACCOUNTS_DATA_EXPECTED);
+    });
+    const request = httpMock.expectOne(`${service.API_URL}/accounts`);
+    expect(request.request.method).toBe('GET');
+    request.flush(ACCOUNTS_DATA);
+  });
 
 });

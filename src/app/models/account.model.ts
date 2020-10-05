@@ -18,7 +18,7 @@ export class Account {
     public readonly clientId: string,
     public readonly accountId: string,
     public readonly balance: number,
-    public readonly number: string,
+    public readonly accountNumber: string,
     public readonly owner: string,
     public readonly ownership: AccountOwnership,
     public readonly type: AccountType,
@@ -31,7 +31,7 @@ export class Account {
 })
 export class AccountAdapter implements Adapter<Account> {
   adapt(item: any): Account {
-    return new Account(item.bank_id, item.client_id, item.id, item.balance, item.number, item.owner, 
+    return new Account(item.bank_id, item.client_id, item.id, item.balance, item.number, item.owner,
       AccountOwnership[item.ownership.toUpperCase() as keyof typeof AccountOwnership],
       AccountType[item.type.toUpperCase() as keyof typeof AccountType],
       item.name);

@@ -35,6 +35,6 @@ export class TransactionAdapter implements Adapter<Transaction> {
   adapt(item: any): Transaction {
     return new Transaction(item.id, item.bank_id, item.client_id, item.account_id,
       item.transaction_id, new Date(item.accounting_date), new Date(item.effective_date),
-      item.amount, item.description, TransactionType[item.transaction_type as keyof typeof TransactionType]);
+      item.amount, item.description, TransactionType[item.transaction_type.toUpperCase() as keyof typeof TransactionType]);
   }
 }

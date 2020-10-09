@@ -2,4 +2,13 @@ div.transaction {
   border: 1px solid black;
   margin: 4px;
   padding: 4px;
+
+  div.amount {
+    float: right;
+  }
+
+  div.amount.credit {
+    color: green;
+    font-weight: bold;
+  }
 }

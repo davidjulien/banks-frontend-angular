@@ -1,6 +1,6 @@
 <div id="{{pTransaction.id}}" class="transaction">
   <div class="source">{{ pTransaction.bank.name }}</div>
   <div class="date">{{ pTransaction.accountingDate| date: "yyyy/MM/dd" }}</div>
-  <div class="amount">{{ pTransaction.amount }} €</div>
+  <div class="amount {{ pTransaction.amount > 0 ? 'credit' : 'debit' }}">{{ pTransaction.amount }} €</div>
   <div class="description">{{ pTransaction.description }}</div>
 </div>

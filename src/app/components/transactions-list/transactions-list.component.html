@@ -1,3 +1,8 @@
 <div class='transactions-list'>
-<app-transaction *ngFor="let transaction of transactions" [transaction]="transaction"></app-transaction>
+<app-transaction *ngFor="let transaction of transactions$ | async" [transaction]="transaction"></app-transaction>
+</div>
+
+<div class="center">
+  <button mat-raised-button color="primary"  (click)="loadMore()" *ngIf="transactions$.hasMore$ | async">Load More</button> &nbsp;
+  <button mat-raised-button color="primary"  (click)="reset()">Reset</button><br>
 </div>

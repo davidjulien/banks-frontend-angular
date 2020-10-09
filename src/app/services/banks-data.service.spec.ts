@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -8,19 +8,25 @@ import { TransactionsPage } from '@app/models/transactions-page.model';
 import { Bank } from '@app/models/bank.model';
 import { Account, AccountOwnership, AccountType } from '@app/models/account.model';
 
-const TRANSACTIONS_DATA = {
-  transactions: [
-    {id: 1, bank_id: 'ing', client_id: 'CLIENT', account_id: 'ACCOUNT', transaction_id: 'TRANSACTION',
-      accounting_date: '2020-09-24', effective_date: '2020-09-24',
-      amount: -123.45, description: 'PAIEMENT PAR CARTE', type: 'sepa_debit'}
-  ]
-};
+const TRANSACTIONS_DATA = JSON.parse('{"transactions":[{"id":1,"bank_id":"ing","client_id":"CLIENT1","account_id":"ACCOUNT1","transaction_id":"TRANSACTION1","accounting_date":"2020-09-24","effective_date":"2020-09-24","amount":-123.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit"}],"next_cursor":"next_cursor","total":5}');
 // Date month starts at 0...
 const TRANSACTIONS_DATA_EXPECTED = new TransactionsPage(
   [
-    new Transaction(1, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION',
+    new Transaction(1, new Bank('ing', 'ING'), 'CLIENT1', 'ACCOUNT1', 'TRANSACTION1',
       new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT)
-  ]);
+  ],
+  'next_cursor',
+  5);
+
+const TRANSACTIONS_DATA_2 = JSON.parse('{"transactions":[{"id":2,"bank_id":"ing","client_id":"CLIENT2","account_id":"ACCOUNT2","transaction_id":"TRANSACTION2","accounting_date":"2020-09-23","effective_date":"2020-09-23","amount":-3.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit"}],"next_cursor":null,"total":5}');
+const TRANSACTIONS_DATA_2_EXPECTED = new TransactionsPage(
+  [
+    new Transaction(2, new Bank('ing', 'ING'), 'CLIENT2', 'ACCOUNT2', 'TRANSACTION2',
+      new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), -3.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT)
+  ],
+  null,
+  5);
+
 
 const BANKS_DATA = [ {id: 'ing', name: 'ING'} ];
 const BANKS_DATA_EXPECTED = [ new Bank('ing', 'ING') ];
@@ -57,21 +63,6 @@ describe('BanksDataService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should returns transactions data', () => {
-    expect(service).toBeTruthy();
-
-    service.getTransactionsPage().subscribe((data: TransactionsPage) => {
-      expect(data).toEqual(TRANSACTIONS_DATA_EXPECTED);
-    });
-
-    // Expect one call to get all banks
-    httpMock.expectOne(`${service.API_URL}/banks`).flush(BANKS_DATA);
-
-    const request = httpMock.expectOne(`${service.API_URL}/transactions`);
-    expect(request.request.method).toBe('GET');
-    request.flush(TRANSACTIONS_DATA);
-  });
-
   it('should returns all banks', () => {
     expect(service).toBeTruthy();
 
@@ -82,6 +73,37 @@ describe('BanksDataService', () => {
     expect(request.request.method).toBe('GET');
     request.flush(BANKS_DATA);
   });
+
+  it('should returns transactions data first page', () => {
+    expect(service).toBeTruthy();
+
+    service.getTransactionsPage(null, 2).subscribe((data: TransactionsPage) => {
+      expect(data).toEqual(TRANSACTIONS_DATA_EXPECTED);
+    });
+
+    // Expect one call to get all banks
+    httpMock.expectOne(`${service.API_URL}/banks`).flush(BANKS_DATA);
+
+    const request = httpMock.expectOne(`${service.API_URL}/transactions?limit=2`);
+    expect(request.request.method).toBe('GET');
+    request.flush(TRANSACTIONS_DATA);
+  });
+
+  it('should returns transactions data next page', () => {
+    expect(service).toBeTruthy();
+
+    service.getTransactionsPage('next_cursor', 2).subscribe((data: TransactionsPage) => {
+      expect(data).toEqual(TRANSACTIONS_DATA_2_EXPECTED);
+    });
+
+    // Expect one call to get all banks
+    httpMock.expectOne(`${service.API_URL}/banks`).flush(BANKS_DATA);
+
+    const request = httpMock.expectOne(`${service.API_URL}/transactions/${TRANSACTIONS_DATA_EXPECTED.nextCursor}?limit=2`);
+    expect(request.request.method).toBe('GET');
+    request.flush(TRANSACTIONS_DATA_2);
+  });
+
 
   it('should returns all accounts', () => {
     expect(service).toBeTruthy();

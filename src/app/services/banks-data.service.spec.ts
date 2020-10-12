@@ -111,6 +111,10 @@ describe('BanksDataService', () => {
     service.getAccounts().subscribe((data: Account[]) => {
       expect(data).toEqual(ACCOUNTS_DATA_EXPECTED);
     });
+
+    // Expect one call to get all banks
+    httpMock.expectOne(`${service.API_URL}/banks`).flush(BANKS_DATA);
+
     const request = httpMock.expectOne(`${service.API_URL}/accounts`);
     expect(request.request.method).toBe('GET');
     request.flush(ACCOUNTS_DATA);

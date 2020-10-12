@@ -1,8 +1,9 @@
 import { Account, AccountOwnership, AccountType } from './account.model';
+import { Bank } from '@app/models/bank.model';
 
 describe('Account', () => {
   it('should create an instance', () => {
-    const bankId = 'ing';
+    const bank: Bank = new Bank('ing', 'ING');
     const clientId = 'client';
     const accountId = 'account';
     const balance = 123.12;
@@ -12,9 +13,9 @@ describe('Account', () => {
     const type = AccountType.SAVINGS;
     const name = 'name';
 
-    const account = new Account(bankId, clientId, accountId, balance, accountNumber, owner, ownership, type, name);
+    const account = new Account(bank, clientId, accountId, balance, accountNumber, owner, ownership, type, name);
     expect(account).toBeTruthy();
-    expect(account.bankId).toBe(bankId);
+    expect(account.bank).toBe(bank);
     expect(account.clientId).toBe(clientId);
     expect(account.balance).toBe(balance);
     expect(account.accountNumber).toBe(accountNumber);

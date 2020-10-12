@@ -39,8 +39,12 @@ export class BanksDataService {
   }
 
   getAccounts(): Observable<Account[]> {
-    return this.http.get(`${this.API_URL}/accounts`).pipe(
-      map((item: any[]) => item.map((subItem: any) => this.accountAdapter.adapt(subItem)) ) // Adapt api result to our data model
+    return forkJoin([
+      this.getBanks(),
+      this.http.get(`${this.API_URL}/accounts`)
+    ]).pipe(
+      map(([allBanks, items]) =>
+        (items as any[]).map((subItem: any) => this.accountAdapter.adapt(subItem, allBanks)) ) // Adapt api result to our data model
     );
   }
 }

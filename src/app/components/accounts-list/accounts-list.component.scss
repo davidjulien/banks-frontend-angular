@@ -1,0 +1,8 @@
+div.accounts-list {
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}

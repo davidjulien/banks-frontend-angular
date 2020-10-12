@@ -3,7 +3,9 @@ BanksFrontendAngular [![Build Status](https://travis-ci.com/davidjulien/banks-fr
 
 An angular frontend to visualize transactions and analyze them. Transactions are fetched by [banks_fetch](https://github.com/davidjulien/banks_fetch).
 
-It is not working yet since `banks_fetch` API has not been implemented yet.
+Angular frontend fetch transactions thanks to `banks_fetch`API and display them.
+
+<img src="https://user-images.githubusercontent.com/726552/95558715-f4f22400-0a16-11eb-9120-c8c743e4c13c.png"></img>
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.1.2.
 

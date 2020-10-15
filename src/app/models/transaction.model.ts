@@ -8,7 +8,9 @@ export enum TransactionType {
     CHECK,
     SEPA_DEBIT,
     TRANSFER,
-    INTERESTS
+    INTERESTS,
+    BANKS_FEES,
+    OTHER
 }
 
 export class Transaction {

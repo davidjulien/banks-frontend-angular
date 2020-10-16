@@ -3,7 +3,7 @@ import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
 
 import { Bank } from '@app/models/bank.model';
-import { Transaction, TransactionType } from '@app/models/transaction.model';
+import { Transaction, TransactionType, PeriodType } from '@app/models/transaction.model';
 import { TransactionsPage } from '@app/models/transactions-page.model';
 
 import { TransactionsListComponent } from './transactions-list.component';
@@ -16,9 +16,11 @@ import { PaginatedData } from '@app/helper/infinite-scroll-data.adapter.ts';
 const TRANSACTIONS_PAGE_1 = new TransactionsPage(
   [
     new Transaction(1, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION1',
-      new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT),
+      new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
+      null, PeriodType.NONE, null, null, null),
     new Transaction(2, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION2',
-      new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), 56.78, 'VIREMENT', TransactionType.TRANSFER)
+      new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), 56.78, 'VIREMENT', TransactionType.TRANSFER,
+      null, PeriodType.NONE, null, null, null)
   ],
   'next_cursor',
   4);
@@ -26,9 +28,11 @@ const TRANSACTIONS_PAGE_1 = new TransactionsPage(
 const TRANSACTIONS_PAGE_2 = new TransactionsPage(
   [
     new Transaction(3, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION3',
-      new Date(Date.UTC(2020, 8, 22)), new Date(Date.UTC(2020, 8, 22)), -3.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT),
+      new Date(Date.UTC(2020, 8, 22)), new Date(Date.UTC(2020, 8, 22)), -3.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
+      null, PeriodType.NONE, null, null, null),
     new Transaction(4, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION4',
-      new Date(Date.UTC(2020, 8, 21)), new Date(Date.UTC(2020, 8, 21)), 5.8, 'VIREMENT', TransactionType.TRANSFER)
+      new Date(Date.UTC(2020, 8, 21)), new Date(Date.UTC(2020, 8, 21)), 5.8, 'VIREMENT', TransactionType.TRANSFER,
+      null, PeriodType.NONE, null, null, null)
   ],
   null,
   4);

@@ -3,10 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, BehaviorSubject } from 'rxjs';
 import { map, first, tap } from 'rxjs/operators';
 
-import { Transaction, TransactionAdapter } from '../models/transaction.model';
-import { TransactionsPage, TransactionsPageAdapter } from '../models/transactions-page.model';
-import { Bank, BankAdapter } from '../models/bank.model';
-import { Account, AccountAdapter } from '../models/account.model';
+import { Transaction, TransactionAdapter } from '@app/models/transaction.model';
+import { TransactionsPage, TransactionsPageAdapter } from '@app/models/transactions-page.model';
+import { Bank, BankAdapter } from '@app/models/bank.model';
+import { Budget } from '@app/models/budget.model';
+import { Category } from '@app/models/category.model';
+import { Store } from '@app/models/store.model';
+import { Account, AccountAdapter } from '@app/models/account.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,10 +27,13 @@ export class BanksDataService {
     const cursorExtension = cursor === null ? '' : `/${cursor}`;
     return forkJoin([
       this.getBanks(),
+      this.getBudgets(),
+      this.getCategories(),
+      this.getStores(),
       this.http.get(`${this.API_URL}/transactions${cursorExtension}?limit=${limit}`)
     ]).pipe(
-      map(([allBanks, transactions]) => {
-        return this.transactionAdapter.adapt(transactions, allBanks); } ) // Adapt api result to our data model
+      map(([allBanks, allBudgets, allCategories, allStores, transactions]) => {
+        return this.transactionAdapter.adapt(transactions, allBanks, allBudgets, allCategories, allStores); } )
     );
   }
 
@@ -35,6 +41,36 @@ export class BanksDataService {
     return this.http.get(`${this.API_URL}/banks`).pipe(
       map((banksData: any[]) =>
         banksData.map((subData: any) => this.bankAdapter.adapt(subData))
+      ));
+  }
+
+  getBudgets(): Observable<Budget[]> {
+    return this.http.get(`${this.API_URL}/budgets`).pipe(
+      map((budgetsData: any[]) =>
+        budgetsData.map((subData: any) => new Budget(subData.id, subData.name))
+      ));
+  }
+
+  getCategories(): Observable<Category[]> {
+    return this.http.get(`${this.API_URL}/categories`).pipe(
+      map((categoriesData: any[]) =>
+        categoriesData.reduce((acc: Category[], subData: any) => {
+          if (subData.up_category_id) {
+            const upCategory: Category = acc.find((elt) => elt.id === subData.up_category_id);
+            const category = new Category(subData.id, subData.name, upCategory);
+            acc.push(category);
+          } else {
+            const category = new Category(subData.id, subData.name, null);
+            acc.push(category);
+          }
+          return acc;
+        }, [])));
+  }
+
+  getStores(): Observable<Store[]> {
+    return this.http.get(`${this.API_URL}/stores`).pipe(
+      map((storesData: any[]) =>
+        storesData.map((subData: any) => new Store(subData.id, subData.name))
       ));
   }
 

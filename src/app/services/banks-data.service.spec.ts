@@ -3,17 +3,25 @@ import { HttpClientModule } from '@angular/common/http';
 import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { BanksDataService } from '@app/services/banks-data.service';
-import { Transaction, TransactionType } from '@app/models/transaction.model';
+import { Transaction, TransactionType, PeriodType } from '@app/models/transaction.model';
 import { TransactionsPage } from '@app/models/transactions-page.model';
 import { Bank } from '@app/models/bank.model';
+import { Budget } from '@app/models/budget.model';
+import { Category } from '@app/models/category.model';
+import { Store } from '@app/models/store.model';
+
 import { Account, AccountOwnership, AccountType } from '@app/models/account.model';
 
-const TRANSACTIONS_DATA = JSON.parse('{"transactions":[{"id":1,"bank_id":"ing","client_id":"CLIENT1","account_id":"ACCOUNT1","transaction_id":"TRANSACTION1","accounting_date":"2020-09-24","effective_date":"2020-09-24","amount":-123.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit"}],"next_cursor":"next_cursor","total":5}');
+const ALIMENTATION_CATEGORY = new Category(6, 'Alimentation', null);
+
+const TRANSACTIONS_DATA = JSON.parse('{"transactions":[{"id":1,"bank_id":"ing","client_id":"CLIENT1","account_id":"ACCOUNT1","transaction_id":"TRANSACTION1","accounting_date":"2020-09-24","effective_date":"2020-09-24","amount":-123.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit","ext_date":"2020-09-23","ext_period":"quarter","ext_budget_id":2,"ext_categories_id":[6,7],"ext_store_id":2}],"next_cursor":"next_cursor","total":5}');
 // Date month starts at 0...
 const TRANSACTIONS_DATA_EXPECTED = new TransactionsPage(
   [
     new Transaction(1, new Bank('ing', 'ING'), 'CLIENT1', 'ACCOUNT1', 'TRANSACTION1',
-      new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT)
+      new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
+      new Date(Date.UTC(2020, 8, 23)), PeriodType.QUARTER, new Budget(2, 'Courant'),
+      [ALIMENTATION_CATEGORY, new Category(7, 'Supermarché', ALIMENTATION_CATEGORY)], new Store(2, 'Intermarché'))
   ],
   'next_cursor',
   5);
@@ -22,11 +30,11 @@ const TRANSACTIONS_DATA_2 = JSON.parse('{"transactions":[{"id":2,"bank_id":"ing"
 const TRANSACTIONS_DATA_2_EXPECTED = new TransactionsPage(
   [
     new Transaction(2, new Bank('ing', 'ING'), 'CLIENT2', 'ACCOUNT2', 'TRANSACTION2',
-      new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), -3.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT)
+      new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), -3.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
+      undefined, PeriodType.NONE, undefined, undefined, undefined)
   ],
   null,
   5);
-
 
 const BANKS_DATA = [ {id: 'ing', name: 'ING'} ];
 const BANKS_DATA_EXPECTED = [ new Bank('ing', 'ING') ];
@@ -40,6 +48,10 @@ const ACCOUNTS_DATA_EXPECTED = [
   new Account(undefined, undefined, 'account3', 88064.58, 'number3', 'owner3', AccountOwnership.JOINT, AccountType.HOME_LOAN,
     'Crédit Immobilier')
 ];
+
+const BUDGETS_DATA = JSON.parse('[{"name":"Aucun","id":1},{"name":"Courant","id":2},{"name":"Plaisir","id":3},{"name":"Exceptionnel","id":4},{"name":"Épargne","id":5}]');
+const CATEGORIES_DATA = JSON.parse('[{"up_category_id":null,"name":"Ressource","id":1},{"up_category_id":null,"name":"Alimentation","id":6},{"up_category_id":1,"name":"Allocation","id":3},{"up_category_id":1,"name":"Intérêts","id":5},{"up_category_id":1,"name":"Donation","id":4},{"up_category_id":1,"name":"Revenu","id":2},{"up_category_id":6,"name":"Supermarché","id":7}]');
+const STORES_DATA = JSON.parse('[{"name":"Carrefour Chambourcy","id":3},{"name":"LIDL St-Germain-en-Laye","id":1},{"name":"Intermarché","id":2},{"name":"Monoprix","id":4},{"name":"Carrefour Market","id":5},{"name":"Naturalia","id":6}]');
 
 
 describe('BanksDataService', () => {
@@ -83,6 +95,12 @@ describe('BanksDataService', () => {
 
     // Expect one call to get all banks
     httpMock.expectOne(`${service.API_URL}/banks`).flush(BANKS_DATA);
+    // Expect one call to get all budgets
+    httpMock.expectOne(`${service.API_URL}/budgets`).flush(BUDGETS_DATA);
+    // Expect one call to get all categories
+    httpMock.expectOne(`${service.API_URL}/categories`).flush(CATEGORIES_DATA);
+    // Expect one call to get all stores
+    httpMock.expectOne(`${service.API_URL}/stores`).flush(STORES_DATA);
 
     const request = httpMock.expectOne(`${service.API_URL}/transactions?limit=2`);
     expect(request.request.method).toBe('GET');
@@ -98,6 +116,12 @@ describe('BanksDataService', () => {
 
     // Expect one call to get all banks
     httpMock.expectOne(`${service.API_URL}/banks`).flush(BANKS_DATA);
+    // Expect one call to get all budgets
+    httpMock.expectOne(`${service.API_URL}/budgets`).flush(BUDGETS_DATA);
+    // Expect one call to get all categories
+    httpMock.expectOne(`${service.API_URL}/categories`).flush(CATEGORIES_DATA);
+    // Expect one call to get all stores
+    httpMock.expectOne(`${service.API_URL}/stores`).flush(STORES_DATA);
 
     const request = httpMock.expectOne(`${service.API_URL}/transactions/${TRANSACTIONS_DATA_EXPECTED.nextCursor}?limit=2`);
     expect(request.request.method).toBe('GET');

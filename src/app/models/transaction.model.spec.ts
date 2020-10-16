@@ -1,5 +1,8 @@
-import { Transaction, TransactionType } from './transaction.model';
+import { Transaction, TransactionType, PeriodType } from './transaction.model';
 import { Bank } from './bank.model';
+import { Budget } from './budget.model';
+import { Category } from './category.model';
+import { Store } from './store.model';
 
 describe('Transaction', () => {
   it('should create an instance', () => {
@@ -13,8 +16,15 @@ describe('Transaction', () => {
     const amount = 2000.00;
     const description = 'PAIEMENT PAR CARTE';
     const transactionType = TransactionType.SEPA_DEBIT;
+    const date = new Date(Date.UTC(2020, 9, 22));
+    const period = PeriodType.NONE;
+    const budget = new Budget(2, 'Courant');
+    const categories = [new Category(1, 'Alimentation', null)];
+    const store = new Store(1, 'SUPERMARCHE');
     const transaction = new Transaction(id, bank, clientId, accountId, transactionId,
-      accountingDate, effectiveDate, amount, description, transactionType);
+      accountingDate, effectiveDate, amount, description, transactionType, date,
+      period, budget, categories, store
+    );
     expect(transaction).toBeTruthy();
     expect(transaction.bank).toBe(bank);
     expect(transaction.amount).toBe(amount);

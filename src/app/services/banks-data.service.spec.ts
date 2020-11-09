@@ -123,7 +123,7 @@ describe('BanksDataService', () => {
     // Expect one call to get all stores
     httpMock.expectOne(`${service.API_URL}/stores`).flush(STORES_DATA);
 
-    const request = httpMock.expectOne(`${service.API_URL}/transactions/${TRANSACTIONS_DATA_EXPECTED.nextCursor}?limit=2`);
+    const request = httpMock.expectOne(`${service.API_URL}/transactions?cursor=${TRANSACTIONS_DATA_EXPECTED.nextCursor}&limit=2`);
     expect(request.request.method).toBe('GET');
     request.flush(TRANSACTIONS_DATA_2);
   });

@@ -24,13 +24,14 @@ export class BanksDataService {
     private transactionAdapter: TransactionsPageAdapter) { }
 
   getTransactionsPage(cursor: string, limit: number): Observable<TransactionsPage> {
-    const cursorExtension = cursor === null ? '' : `/${cursor}`;
+    const cursorExtension = cursor === null ? '' : `?cursor=${cursor}`;
+    const limitExtension = cursor === null ? `?limit=${limit}` : `&limit=${limit}`;
     return forkJoin([
       this.getBanks(),
       this.getBudgets(),
       this.getCategories(),
       this.getStores(),
-      this.http.get(`${this.API_URL}/transactions${cursorExtension}?limit=${limit}`)
+      this.http.get(`${this.API_URL}/transactions${cursorExtension}${limitExtension}`)
     ]).pipe(
       map(([allBanks, allBudgets, allCategories, allStores, transactions]) => {
         return this.transactionAdapter.adapt(transactions, allBanks, allBudgets, allCategories, allStores); } )

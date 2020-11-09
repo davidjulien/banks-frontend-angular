@@ -39,7 +39,8 @@ describe('TransactionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ FormsModule, ReactiveFormsModule, MatSelectModule, MatFormFieldModule, BrowserAnimationsModule, MatDatepickerModule, MatInputModule, MatNativeDateModule ],
+      imports: [ FormsModule, ReactiveFormsModule, MatSelectModule, MatFormFieldModule, BrowserAnimationsModule,
+        MatDatepickerModule, MatInputModule, MatNativeDateModule ],
       providers: [ MatNativeDateModule ],
       declarations: [ TransactionComponent ]
     })

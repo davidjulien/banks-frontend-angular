@@ -75,7 +75,8 @@ describe('TransactionsListComponent', () => {
     getStoresSpy = banksDataService.getCategories.and.returnValue( of(STORES) );
 
     TestBed.configureTestingModule({
-      imports: [ MatSelectModule, MatFormFieldModule, BrowserAnimationsModule, MatInputModule, MatDatepickerModule, MatNativeDateModule, FormsModule ],
+      imports: [ MatSelectModule, MatFormFieldModule, BrowserAnimationsModule, MatInputModule,
+        MatDatepickerModule, MatNativeDateModule, FormsModule ],
       declarations: [ TransactionsListComponent, TransactionComponent ],
       providers: [{provide: BanksDataService, useValue: banksDataService}, MatNativeDateModule]
     })

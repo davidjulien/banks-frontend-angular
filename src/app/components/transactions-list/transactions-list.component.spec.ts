@@ -1,8 +1,18 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDatepickerModule} from '@angular/material/datepicker';
+import { MatInputModule} from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
 
 import { Bank } from '@app/models/bank.model';
+import { Budget } from '@app/models/budget.model';
+import { Store } from '@app/models/store.model';
+import { Category } from '@app/models/category.model';
 import { Transaction, TransactionType, PeriodType } from '@app/models/transaction.model';
 import { TransactionsPage } from '@app/models/transactions-page.model';
 
@@ -11,6 +21,15 @@ import { TransactionComponent } from '@app/components/transaction/transaction.co
 
 import { BanksDataService } from '@app/services/banks-data.service';
 import { PaginatedData } from '@app/helper/infinite-scroll-data.adapter.ts';
+
+
+const BUDGETS = [new Budget(1, 'Courant'), new Budget(2, 'Extra')];
+
+const CAT_ALIMENTATION = new Category(1, 'Alimentation', null);
+const CAT_SUPERMARCHE = new Category(2, 'Supermarché', CAT_ALIMENTATION);
+const CATEGORIES = [CAT_ALIMENTATION, CAT_SUPERMARCHE];
+
+const STORES = [new Store(1, 'Auchan'), new Store(2, 'Carrefour')];
 
 // Date month starts at 0...
 const TRANSACTIONS_PAGE_1 = new TransactionsPage(
@@ -44,12 +63,21 @@ describe('TransactionsListComponent', () => {
   let component: TransactionsListComponent;
   let fixture: ComponentFixture<TransactionsListComponent>;
   let getTransactionsPageSpy;
+  let getBudgetsSpy;
+  let getCategoriesSpy;
+  let getStoresSpy;
 
   beforeEach(async () => {
-    banksDataService = jasmine.createSpyObj('BanksDataService', ['getTransactionsPage']);
+    banksDataService = jasmine.createSpyObj('BanksDataService', ['getTransactionsPage', 'getBudgets', 'getCategories', 'getStores']);
+
+    getBudgetsSpy = banksDataService.getBudgets.and.returnValue( of(BUDGETS) );
+    getCategoriesSpy = banksDataService.getCategories.and.returnValue( of(CATEGORIES) );
+    getStoresSpy = banksDataService.getCategories.and.returnValue( of(STORES) );
+
     TestBed.configureTestingModule({
+      imports: [ MatSelectModule, MatFormFieldModule, BrowserAnimationsModule, MatInputModule, MatDatepickerModule, MatNativeDateModule, FormsModule ],
       declarations: [ TransactionsListComponent, TransactionComponent ],
-      providers: [{provide: BanksDataService, useValue: banksDataService}]
+      providers: [{provide: BanksDataService, useValue: banksDataService}, MatNativeDateModule]
     })
     .compileComponents();
   });
@@ -65,7 +93,10 @@ describe('TransactionsListComponent', () => {
 
     fixture.detectChanges();
     expect(component).toBeTruthy();
-    expect(getTransactionsPageSpy).toHaveBeenCalled();
+    expect(getTransactionsPageSpy).toHaveBeenCalledTimes(1);
+    expect(getBudgetsSpy).toHaveBeenCalledTimes(1);
+    expect(getCategoriesSpy).toHaveBeenCalledTimes(1);
+    expect(getStoresSpy).toHaveBeenCalledTimes(1);
 
     tick();
     fixture.detectChanges();
@@ -81,8 +112,10 @@ describe('TransactionsListComponent', () => {
 
     fixture.detectChanges();
     expect(component).toBeTruthy();
-    expect(getTransactionsPageSpy).toHaveBeenCalled();
     expect(getTransactionsPageSpy).toHaveBeenCalledTimes(1);
+    expect(getBudgetsSpy).toHaveBeenCalledTimes(1);
+    expect(getCategoriesSpy).toHaveBeenCalledTimes(1);
+    expect(getStoresSpy).toHaveBeenCalledTimes(1);
 
     tick();
     fixture.detectChanges();
@@ -114,8 +147,10 @@ describe('TransactionsListComponent', () => {
 
     fixture.detectChanges();
     expect(component).toBeTruthy();
-    expect(getTransactionsPageSpy).toHaveBeenCalled();
     expect(getTransactionsPageSpy).toHaveBeenCalledTimes(1);
+    expect(getBudgetsSpy).toHaveBeenCalledTimes(1);
+    expect(getCategoriesSpy).toHaveBeenCalledTimes(1);
+    expect(getStoresSpy).toHaveBeenCalledTimes(1);
 
     tick();
     fixture.detectChanges();
@@ -150,7 +185,10 @@ describe('TransactionsListComponent', () => {
 
     fixture.detectChanges();
     expect(component).toBeTruthy();
-    expect(getTransactionsPageSpy).toHaveBeenCalled();
+    expect(getTransactionsPageSpy).toHaveBeenCalledTimes(1);
+    expect(getBudgetsSpy).toHaveBeenCalledTimes(1);
+    expect(getCategoriesSpy).toHaveBeenCalledTimes(1);
+    expect(getStoresSpy).toHaveBeenCalledTimes(1);
 
     tick();
     fixture.detectChanges();

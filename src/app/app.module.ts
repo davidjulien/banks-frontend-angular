@@ -8,6 +8,17 @@ import { TransactionComponent } from '@app/components/transaction/transaction.co
 import { TransactionsListComponent } from '@app/components/transactions-list/transactions-list.component';
 import { AccountComponent } from '@app/components/account/account.component';
 import { AccountsListComponent } from '@app/components/accounts-list/accounts-list.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule} from '@angular/material/datepicker';
+import { MatInputModule} from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
+
+
+
 
 @NgModule({
   declarations: [
@@ -20,9 +31,17 @@ import { AccountsListComponent } from '@app/components/accounts-list/accounts-li
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatNativeDateModule
   ],
-  providers: [],
+  providers: [MatNativeDateModule],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

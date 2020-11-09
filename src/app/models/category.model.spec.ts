@@ -9,6 +9,7 @@ describe('Category', () => {
     expect(category1.id).toBe(id1);
     expect(category1.name).toBe(name1);
     expect(category1.upCategory).toBe(null);
+    expect(category1.level).toBe(1);
 
     const id2 = 2;
     const name2 = 'Supermarché';
@@ -17,5 +18,6 @@ describe('Category', () => {
     expect(category2.id).toBe(id2);
     expect(category2.name).toBe(name2);
     expect(category2.upCategory).toBe(category1);
+    expect(category2.level).toBe(2);
   });
 });

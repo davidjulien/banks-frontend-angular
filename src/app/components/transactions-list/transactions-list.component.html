@@ -1,5 +1,5 @@
 <div class='transactions-list'>
-<app-transaction *ngFor="let transaction of transactions$ | async" [transaction]="transaction"></app-transaction>
+<app-transaction *ngFor="let transaction of transactions$ | async" [transaction]="transaction" [stores$]="stores$" [budgets$]="budgets$" [categories$]="categories$"></app-transaction>
 </div>
 
 <div class="center">

@@ -4,7 +4,12 @@ div.transaction {
   padding: 4px;
 
   div.amount {
-    float: right;
+    float: left;
+    font-size: 150%;
+    width: 100px;
+    padding: 4px;
+    margin: 4px;
+    text-align: right;
   }
 
   div.amount.credit {
@@ -14,5 +19,38 @@ div.transaction {
 
   div.description.real {
     background-color: lightgrey;
+  }
+
+  div.extended_info {
+    float: left;
+    div {
+      border-radius: 8px;
+      border: 1px solid black;
+      float: left;
+      padding: 4px;
+      margin: 4px;
+      width: 130pt;
+      height: 16pt;
+      overflow: hidden;
+    }
+
+    div.missing {
+      border-color: red;
+      border-width: 3px;
+    }
+
+    div.date {
+      background-color: #F5DEB3;
+    }
+    div.store {
+      background-color: #CCEECC;
+    }
+    div.budget {
+      background-color: #CCDDFF;
+    }
+    div.categories {
+      background-color: #FFA07A;
+      width: 390pt;
+    }
   }
 }

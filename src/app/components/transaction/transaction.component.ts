@@ -4,7 +4,6 @@ import { Transaction } from '@app/models/transaction.model';
 import { Store } from '@app/models/store.model';
 import { Budget } from '@app/models/budget.model';
 import { Category } from '@app/models/category.model';
-import { BanksDataService } from '@app/services/banks-data.service';
 
 @Component({
   selector: 'app-transaction',
@@ -17,10 +16,7 @@ export class TransactionComponent implements OnInit {
   pBudgets$: Observable<Budget[]>;
   pCategories$: Observable<Category[]>;
 
-  date: Date;
-  storeSelectedId: number;
-  budgetSelectedId: number;
-  categoriesSelectedIds: number[];
+  categoriesText: string;
 
   constructor() { }
 
@@ -30,10 +26,11 @@ export class TransactionComponent implements OnInit {
   @Input()
   set transaction(transaction: Transaction) {
     this.pTransaction = transaction;
-    this.storeSelectedId = this.pTransaction.store == null ? null : this.pTransaction.store.id;
-    this.budgetSelectedId = this.pTransaction.budget == null ? null : this.pTransaction.budget.id;
-    this.categoriesSelectedIds = this.pTransaction.categories == null ? null : this.pTransaction.categories.map((cat) => cat.id);
-    this.date = this.pTransaction.date;
+    if (this.pTransaction.categories) {
+      this.categoriesText = this.pTransaction.categories.map((cat) => cat.name).join(' > ');
+    } else {
+      this.categoriesText = '(no categories)';
+    }
   }
 
   get transaction(): Transaction {

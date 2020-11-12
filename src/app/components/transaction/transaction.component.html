@@ -1,35 +1,16 @@
 <div id="{{pTransaction.id}}" class="transaction">
-  <div class="source">{{ pTransaction.bank.name }}</div>
-  <div class="date">{{ pTransaction.accountingDate| date: "yyyy/MM/dd" }}</div>
   <div class="amount {{ pTransaction.amount > 0 ? 'credit' : 'debit' }}">{{ pTransaction.amount }} €</div>
-  <div class="description {{ pTransaction.store == undefined ? 'real' : 'store' }}">{{ pTransaction.store == undefined ? pTransaction.description : (pTransaction.store.name + " (" + (pTransaction.date| date: "yyyy/MM/dd")) + ")" }}</div>
+  <div class="extended_info">
+    <div class="store {{pTransaction.store == undefined ? 'missing' : ''}}">{{ pTransaction.store == undefined ? "(no store)" : pTransaction.store.name }}</div>
+    <div class="date {{pTransaction.date == undefined ? 'missing' : ''}}">{{ pTransaction.date == undefined ? "(no date)" : pTransaction.date| date: "yyyy/MM/dd" }}</div>
+    <div class="budget {{pTransaction.budget == undefined ? 'missing' : ''}}">{{ pTransaction.budget == undefined ? "(no budget)" : pTransaction.budget.name }}</div>
+    <div class="categories">{{ categoriesText }}</div>
+  </div>
 
-  <mat-form-field>
-    <mat-label>Date</mat-label>
-     <input matInput [matDatepicker]="picker" [value]="pTransaction.date" (dateChange)="onDateChange($event)">
-     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-     <mat-datepicker #picker></mat-datepicker>
-  </mat-form-field>
+  <div class="clearfix"></div>
 
-  <mat-form-field id="store">
-    <mat-label>Store</mat-label>
-    <mat-select [(value)]="storeSelectedId" (selectionChange)="onStoreChange($event)">
-      <mat-option *ngFor="let store of pStores$ | async" [(value)]="store.id">{{store.name}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field>
-    <mat-label>Budget</mat-label>
-    <mat-select [(value)]="budgetSelectedId" (selectionChange)="onBudgetChange($event)">
-      <mat-option *ngFor="let budget of pBudgets$ | async" [(value)]="budget.id">{{budget.name}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field>
-    <mat-label>Categories</mat-label>
-    <mat-select [(value)]="categoriesSelectedIds" multiple (selectionChange)="onCategoriesChange($event)">
-      <mat-option *ngFor="let category of pCategories$ | async" [(value)]="category.id" style="padding-left: {{ category.level * 5 }}px">{{category.name}}</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <div class="source">{{ pTransaction.bank.name }}</div>
+  <div class="accounting_date">{{ pTransaction.accountingDate| date: "yyyy/MM/dd" }}</div>
+  <div class="description">{{ pTransaction.description }}</div>
 
 </div>

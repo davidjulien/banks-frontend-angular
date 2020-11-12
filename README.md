@@ -5,7 +5,7 @@ An angular frontend to visualize transactions and analyze them. Transactions are
 
 Angular frontend fetch transactions thanks to `banks_fetch`API and display them.
 
-<img src="https://user-images.githubusercontent.com/726552/95558715-f4f22400-0a16-11eb-9120-c8c743e4c13c.png"></img>
+<img src="https://user-images.githubusercontent.com/726552/98953590-2752dd80-24fd-11eb-935d-dc547a1fd462.png"></img>
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.1.2.
 

@@ -6,7 +6,7 @@ import { Store } from './store.model';
 
 describe('Transaction', () => {
   it('should create an instance', () => {
-    const id = 1;
+    const id = '1';
     const bank: Bank = new Bank('ing', 'ING');
     const clientId = 'CLIENT';
     const accountId = 'ACCOUNT';
@@ -17,7 +17,7 @@ describe('Transaction', () => {
     const description = 'PAIEMENT PAR CARTE';
     const transactionType = TransactionType.SEPA_DEBIT;
     const date = new Date(Date.UTC(2020, 9, 22));
-    const period = PeriodType.NONE;
+    const period = PeriodType.MONTH;
     const budget = new Budget(2, 'Courant');
     const categories = [new Category(1, 'Alimentation', null)];
     const store = new Store(1, 'SUPERMARCHE');

@@ -1,4 +1,5 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { DatePipe } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -14,24 +15,29 @@ import { Account, AccountOwnership, AccountType } from '@app/models/account.mode
 
 const ALIMENTATION_CATEGORY = new Category(6, 'Alimentation', null);
 
-const TRANSACTIONS_DATA = JSON.parse('{"transactions":[{"id":1,"bank_id":"ing","client_id":"CLIENT1","account_id":"ACCOUNT1","transaction_id":"TRANSACTION1","accounting_date":"2020-09-24","effective_date":"2020-09-24","amount":-123.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit","ext_date":"2020-09-23","ext_period":"quarter","ext_budget_id":2,"ext_categories_id":[6,7],"ext_store_id":2}],"next_cursor":"next_cursor","total":5}');
+const TRANSACTION_DATA_STR = '{"id":"T1","bank_id":"ing","client_id":"CLIENT1","account_id":"ACCOUNT1","transaction_id":"TRANSACTION1","accounting_date":"2020-09-24","effective_date":"2020-09-24","amount":-123.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit","ext_date":"2020-09-23","ext_period":"quarter","ext_budget_id":2,"ext_categories_id":[6,7],"ext_store_id":2}';
+const TRANSACTION_DATA = JSON.parse(TRANSACTION_DATA_STR);
+
+const TRANSACTION_DATA_EXPECTED = new Transaction('T1', new Bank('ing', 'ING'), 'CLIENT1', 'ACCOUNT1', 'TRANSACTION1',
+      new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
+      new Date(Date.UTC(2020, 8, 23)), PeriodType.QUARTER, new Budget(2, 'Courant'),
+      [ALIMENTATION_CATEGORY, new Category(7, 'Supermarché', ALIMENTATION_CATEGORY)], new Store(2, 'Intermarché'));
+
+const TRANSACTIONS_DATA = JSON.parse('{"transactions":[' + TRANSACTION_DATA_STR + '],"next_cursor":"next_cursor","total":5}');
 // Date month starts at 0...
 const TRANSACTIONS_DATA_EXPECTED = new TransactionsPage(
   [
-    new Transaction(1, new Bank('ing', 'ING'), 'CLIENT1', 'ACCOUNT1', 'TRANSACTION1',
-      new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
-      new Date(Date.UTC(2020, 8, 23)), PeriodType.QUARTER, new Budget(2, 'Courant'),
-      [ALIMENTATION_CATEGORY, new Category(7, 'Supermarché', ALIMENTATION_CATEGORY)], new Store(2, 'Intermarché'))
+    TRANSACTION_DATA_EXPECTED
   ],
   'next_cursor',
   5);
 
-const TRANSACTIONS_DATA_2 = JSON.parse('{"transactions":[{"id":2,"bank_id":"ing","client_id":"CLIENT2","account_id":"ACCOUNT2","transaction_id":"TRANSACTION2","accounting_date":"2020-09-23","effective_date":"2020-09-23","amount":-3.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit"}],"next_cursor":null,"total":5}');
+const TRANSACTIONS_DATA_2 = JSON.parse('{"transactions":[{"id":"T2","bank_id":"ing","client_id":"CLIENT2","account_id":"ACCOUNT2","transaction_id":"TRANSACTION2","accounting_date":"2020-09-23","effective_date":"2020-09-23","amount":-3.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit"}],"next_cursor":null,"total":5}');
 const TRANSACTIONS_DATA_2_EXPECTED = new TransactionsPage(
   [
-    new Transaction(2, new Bank('ing', 'ING'), 'CLIENT2', 'ACCOUNT2', 'TRANSACTION2',
+    new Transaction('T2', new Bank('ing', 'ING'), 'CLIENT2', 'ACCOUNT2', 'TRANSACTION2',
       new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), -3.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
-      undefined, PeriodType.NONE, undefined, undefined, undefined)
+      undefined, undefined, undefined, undefined, undefined)
   ],
   null,
   5);
@@ -61,7 +67,7 @@ describe('BanksDataService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [BanksDataService]
+      providers: [BanksDataService, DatePipe]
     });
     service = TestBed.inject(BanksDataService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -143,5 +149,122 @@ describe('BanksDataService', () => {
     expect(request.request.method).toBe('GET');
     request.flush(ACCOUNTS_DATA);
   });
+
+
+  it('should update a transaction and return updated transaction', () => {
+    const bankId = 'ing';
+    const clientId = 'CLIENT1';
+    const accountId = 'ACCOUNT1';
+    const transactionId = 'TRANSACTION1';
+    const date = new Date(2020, 8, 23);
+    const period = PeriodType.QUARTER;
+    const storeId = 2;
+    const budgetId = 2;
+    const categoriesIds = [6, 7];
+
+    expect(service).toBeTruthy();
+
+    service.updateTransaction(bankId, clientId, accountId, transactionId, date, period, storeId, budgetId, categoriesIds)
+      .subscribe(
+        (data: Transaction) => {
+          expect(data).toEqual(TRANSACTION_DATA_EXPECTED);
+        },
+        error => expect(true).toBe(false)
+      );
+
+    // Expected calls
+    httpMock.expectOne(`${service.API_URL}/banks`).flush(BANKS_DATA);
+    httpMock.expectOne(`${service.API_URL}/budgets`).flush(BUDGETS_DATA);
+    httpMock.expectOne(`${service.API_URL}/categories`).flush(CATEGORIES_DATA);
+    httpMock.expectOne(`${service.API_URL}/stores`).flush(STORES_DATA);
+
+    const request = httpMock.expectOne(`${service.API_URL}/transactions/${bankId}/${clientId}/${accountId}/${transactionId}`);
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({
+      ext_date: '2020-09-23',
+      ext_period : period,
+      ext_store_id: storeId,
+      ext_budget_id: budgetId,
+      ext_categories_ids: categoriesIds
+    });
+    request.flush(TRANSACTION_DATA);
+  });
+
+  it('should update a transaction but API returns an error', () => {
+    const bankId = 'ing';
+    const clientId = 'CLIENT1';
+    const accountId = 'ACCOUNT1';
+    const transactionId = 'TRANSACTION1';
+    const date = new Date(2020, 8, 23);
+    const period = undefined;
+    const storeId = 2;
+    const budgetId = 2;
+    const categoriesIds = [6, 7];
+
+    expect(service).toBeTruthy();
+
+    service.updateTransaction(bankId, clientId, accountId, transactionId, date, period, storeId, budgetId, categoriesIds)
+      .subscribe(
+        data => expect(true).toBe(false),
+        error => expect(error).toBe('Unable to update transaction info.')
+      );
+
+    // Expected calls
+    httpMock.expectOne(`${service.API_URL}/banks`).flush(BANKS_DATA);
+    httpMock.expectOne(`${service.API_URL}/budgets`).flush(BUDGETS_DATA);
+    httpMock.expectOne(`${service.API_URL}/categories`).flush(CATEGORIES_DATA);
+    httpMock.expectOne(`${service.API_URL}/stores`).flush(STORES_DATA);
+
+    const request = httpMock.expectOne(`${service.API_URL}/transactions/${bankId}/${clientId}/${accountId}/${transactionId}`);
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({
+      ext_date: '2020-09-23',
+      ext_period : null,
+      ext_store_id: storeId,
+      ext_budget_id: budgetId,
+      ext_categories_ids: categoriesIds
+    });
+    const mockErrorResponse = { status: 400, statusText: 'Bad Request' };
+    request.flush('Invalid parameters', mockErrorResponse);
+  });
+
+  it('should update a transaction but an error occurs in client', () => {
+    const bankId = 'ing';
+    const clientId = 'CLIENT1';
+    const accountId = 'ACCOUNT1';
+    const transactionId = 'TRANSACTION1';
+    const date = new Date(2020, 8, 23);
+    const period = undefined;
+    const storeId = 2;
+    const budgetId = 2;
+    const categoriesIds = [6, 7];
+
+    expect(service).toBeTruthy();
+
+    service.updateTransaction(bankId, clientId, accountId, transactionId, date, period, storeId, budgetId, categoriesIds)
+      .subscribe(
+        data => expect(true).toBe(false),
+        error => expect(error).toBe('Unable to update transaction info.')
+      );
+
+    // Expected calls
+    httpMock.expectOne(`${service.API_URL}/banks`).flush(BANKS_DATA);
+    httpMock.expectOne(`${service.API_URL}/budgets`).flush(BUDGETS_DATA);
+    httpMock.expectOne(`${service.API_URL}/categories`).flush(CATEGORIES_DATA);
+    httpMock.expectOne(`${service.API_URL}/stores`).flush(STORES_DATA);
+
+    const request = httpMock.expectOne(`${service.API_URL}/transactions/${bankId}/${clientId}/${accountId}/${transactionId}`);
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({
+      ext_date: '2020-09-23',
+      ext_period : null,
+      ext_store_id: storeId,
+      ext_budget_id: budgetId,
+      ext_categories_ids: categoriesIds
+    });
+    const mockErrorResponse = { status: 400, statusText: 'Bad Request' };
+    request.error(new ErrorEvent('fail'));
+  });
+
 
 });

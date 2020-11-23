@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule} from '@angular/material/datepicker';
 import { MatInputModule} from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -34,24 +34,24 @@ const STORES = [new Store(1, 'Auchan'), new Store(2, 'Carrefour')];
 // Date month starts at 0...
 const TRANSACTIONS_PAGE_1 = new TransactionsPage(
   [
-    new Transaction(1, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION1',
+    new Transaction('T1', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION1',
       new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
-      null, PeriodType.NONE, null, null, null),
-    new Transaction(2, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION2',
+      null, null, null, null, null),
+    new Transaction('T2', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION2',
       new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), 56.78, 'VIREMENT', TransactionType.TRANSFER,
-      null, PeriodType.NONE, null, null, null)
+      null, null, null, null, null)
   ],
   'next_cursor',
   4);
 
 const TRANSACTIONS_PAGE_2 = new TransactionsPage(
   [
-    new Transaction(3, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION3',
+    new Transaction('T3', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION3',
       new Date(Date.UTC(2020, 8, 22)), new Date(Date.UTC(2020, 8, 22)), -3.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
-      null, PeriodType.NONE, null, null, null),
-    new Transaction(4, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION4',
+      null, null, null, null, null),
+    new Transaction('T4', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION4',
       new Date(Date.UTC(2020, 8, 21)), new Date(Date.UTC(2020, 8, 21)), 5.8, 'VIREMENT', TransactionType.TRANSFER,
-      null, PeriodType.NONE, null, null, null)
+      null, null, null, null, null)
   ],
   null,
   4);
@@ -78,7 +78,7 @@ describe('TransactionsListComponent', () => {
       imports: [ MatSelectModule, MatFormFieldModule, BrowserAnimationsModule, MatInputModule,
         MatDatepickerModule, MatNativeDateModule, FormsModule ],
       declarations: [ TransactionsListComponent, TransactionComponent ],
-      providers: [{provide: BanksDataService, useValue: banksDataService}, MatNativeDateModule]
+      providers: [{provide: BanksDataService, useValue: banksDataService}, MatNativeDateModule, FormBuilder]
     })
     .compileComponents();
   });

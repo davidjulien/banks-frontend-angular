@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { DatePipe } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -41,7 +42,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatInputModule,
     MatNativeDateModule
   ],
-  providers: [MatNativeDateModule],
+  providers: [MatNativeDateModule, DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

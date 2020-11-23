@@ -3,6 +3,18 @@ div.transaction {
   margin: 4px;
   padding: 4px;
 
+  div.info {
+    float: left;
+    width: 800pt;
+  }
+
+  div.basic {
+    div {
+      float: left;
+      margin: 4px;
+    }
+  }
+
   div.amount {
     float: left;
     font-size: 150%;
@@ -10,6 +22,7 @@ div.transaction {
     padding: 4px;
     margin: 4px;
     text-align: right;
+    height: 40pt;
   }
 
   div.amount.credit {
@@ -17,12 +30,14 @@ div.transaction {
     font-weight: bold;
   }
 
-  div.description.real {
-    background-color: lightgrey;
+  div.error {
+    float: left;
+    color: red;
   }
 
   div.extended_info {
     float: left;
+
     div {
       border-radius: 8px;
       border: 1px solid black;
@@ -41,12 +56,18 @@ div.transaction {
 
     div.date {
       background-color: #F5DEB3;
+      width: 65pt;
+    }
+    div.period {
+      background-color: #F5DEB3;
+      width: 65pt;
     }
     div.store {
       background-color: #CCEECC;
     }
     div.budget {
       background-color: #CCDDFF;
+      width: 65pt;
     }
     div.categories {
       background-color: #FFA07A;

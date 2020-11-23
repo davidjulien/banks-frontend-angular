@@ -8,6 +8,7 @@ import { MatInputModule} from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { FormBuilder } from '@angular/forms';
 
 import { Bank } from '@app/models/bank.model';
 import { Budget } from '@app/models/budget.model';
@@ -34,10 +35,10 @@ const STORES = [new Store(1, 'Auchan'), new Store(2, 'Carrefour')];
 // Date month starts at 0...
 const TRANSACTIONS_PAGE_1 = new TransactionsPage(
   [
-    new Transaction(1, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION1',
+    new Transaction('T1', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION1',
       new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
       null, null, null, null, null),
-    new Transaction(2, new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION2',
+    new Transaction('T2', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION2',
       new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), 56.78, 'VIREMENT', TransactionType.TRANSFER,
       null, null, null, null, null)
   ],
@@ -61,7 +62,7 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent, AccountsListComponent, TransactionsListComponent, TransactionComponent
       ],
-      providers: [{provide: BanksDataService, useValue: banksDataService}, MatNativeDateModule ]
+      providers: [{provide: BanksDataService, useValue: banksDataService}, MatNativeDateModule, FormBuilder ]
     }).compileComponents();
   });
 

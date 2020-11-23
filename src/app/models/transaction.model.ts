@@ -17,16 +17,16 @@ export enum TransactionType {
 }
 
 export enum PeriodType {
-  NONE = 0,
-    BIMESTER,
-    QUARTER,
-    SEMESTER,
-    ANNUAL
+  MONTH = 'month',
+    BIMESTER = 'bimester',
+    QUARTER = 'quarter',
+    SEMESTER = 'semester',
+    ANNUAL = 'annual'
 }
 
 export class Transaction {
   constructor(
-    public readonly id: number,
+    public readonly id: string,
     public readonly bank: Bank,
     public readonly clientId: string,
     public readonly accountId: string,
@@ -57,7 +57,7 @@ export class TransactionAdapter {
       item.ext_categories_id.map((categoryId) => allCategories.find((aCategory) => aCategory.id === categoryId));
     const store: Store = allStores.find((aStore) => aStore.id === item.ext_store_id);
     const period: PeriodType = item.ext_period === null || item.ext_period === undefined ?
-      PeriodType.NONE : PeriodType[item.ext_period.toUpperCase() as keyof typeof PeriodType];
+      undefined : PeriodType[item.ext_period.toUpperCase() as keyof typeof PeriodType];
     return new Transaction(item.id, bank, item.client_id, item.account_id,
       item.transaction_id, new Date(item.accounting_date), new Date(item.effective_date),
       item.amount, item.description, TransactionType[item.type.toUpperCase() as keyof typeof TransactionType],

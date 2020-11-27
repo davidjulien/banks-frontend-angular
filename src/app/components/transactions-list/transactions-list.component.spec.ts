@@ -72,7 +72,7 @@ describe('TransactionsListComponent', () => {
 
     getBudgetsSpy = banksDataService.getBudgets.and.returnValue( of(BUDGETS) );
     getCategoriesSpy = banksDataService.getCategories.and.returnValue( of(CATEGORIES) );
-    getStoresSpy = banksDataService.getCategories.and.returnValue( of(STORES) );
+    getStoresSpy = banksDataService.getStores.and.returnValue( of(STORES) );
 
     TestBed.configureTestingModule({
       imports: [ MatSelectModule, MatFormFieldModule, BrowserAnimationsModule, MatInputModule,

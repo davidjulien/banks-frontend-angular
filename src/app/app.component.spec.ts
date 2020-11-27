@@ -78,7 +78,7 @@ describe('AppComponent', () => {
     const getAccountsSpy = banksDataService.getAccounts.and.returnValue( of (ACCOUNTS_1) );
     const getBudgetsSpy = banksDataService.getBudgets.and.returnValue( of(BUDGETS) );
     const getCategoriesSpy = banksDataService.getCategories.and.returnValue( of(CATEGORIES) );
-    const getStoresSpy = banksDataService.getCategories.and.returnValue( of(STORES) );
+    const getStoresSpy = banksDataService.getStores.and.returnValue( of(STORES) );
 
     const getTransactionsPageSpy = banksDataService.getTransactionsPage.
       withArgs(null, 10).and.returnValue( of(TRANSACTIONS_PAGE_1) );

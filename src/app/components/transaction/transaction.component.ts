@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, tap, map } from 'rxjs/operators';
 import { Transaction, PeriodType } from '@app/models/transaction.model';
 import { Store } from '@app/models/store.model';
 import { Budget } from '@app/models/budget.model';
@@ -62,17 +62,26 @@ export class TransactionComponent implements OnInit {
 
   @Input()
   set stores$(stores$: Observable<Store[]>) {
-    this.pStores$ = stores$;
+    this.pStores$ = stores$.pipe(
+      map((stores: Store[]) =>
+        stores.sort((s1, s2) => s1.name.localeCompare(s2.name))
+      ));
   }
 
   @Input()
   set budgets$(budgets$: Observable<Budget[]>) {
-    this.pBudgets$ = budgets$;
+    this.pBudgets$ = budgets$.pipe(
+      map((budgets: Budget[]) =>
+        budgets.sort((b1, b2) => b1.name.localeCompare(b2.name))
+      ));
   }
 
   @Input()
   set categories$(categories$: Observable<Category[]>) {
-    this.pCategories$ = categories$;
+    this.pCategories$ = categories$.pipe(
+      map((categories: Category[]) =>
+        categories.sort((c1, c2) => c1.compareTo(c2))
+      ));
   }
 
   onSubmit(val): void {

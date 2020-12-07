@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { catchError, tap, map } from 'rxjs/operators';
+import { catchError, tap, map, switchMap, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { Transaction, PeriodType } from '@app/models/transaction.model';
 import { Store } from '@app/models/store.model';
 import { Budget } from '@app/models/budget.model';
@@ -24,6 +24,7 @@ export class TransactionComponent implements OnInit {
 
   pTransaction: Transaction;
   pStores$: Observable<Store[]>;
+  pStoresFiltered$: Observable<Store[]>;
   pBudgets$: Observable<Budget[]>;
   pCategories$: Observable<Category[]>;
 
@@ -31,6 +32,8 @@ export class TransactionComponent implements OnInit {
 
   edition: boolean;
   formGroup: FormGroup;
+
+  allStores: Store[] = null;
   errorMessage: string;
 
   constructor(private banksDataService: BanksDataService, private formBuilder: FormBuilder) { }
@@ -42,10 +45,26 @@ export class TransactionComponent implements OnInit {
   }
 
   createForm(): void {
+    const storeControl = new FormControl(null);
+    this.pStoresFiltered$ = storeControl.valueChanges
+      .pipe(
+        startWith(''),
+        distinctUntilChanged(),
+        switchMap(value => {
+          const filterValue = value ? (value.name ? value.name : value).toLowerCase() : '';
+          return this.pStores$.pipe(
+            map((stores: Store[]) => {
+              this.allStores = stores;
+              const filtered = stores.filter((store: Store) => store.name.toLowerCase().includes(filterValue));
+              return filtered;
+            }));
+        })
+      );
+
     this.formGroup = this.formBuilder.group({
       date: [null],
       period: [null],
-      store: [null],
+      store: storeControl,
       budget: [null],
       categories: [null]
     });
@@ -86,13 +105,14 @@ export class TransactionComponent implements OnInit {
 
   onSubmit(val): void {
     this.banksDataService.updateTransaction(this.pTransaction.bank.id, this.pTransaction.clientId, this.pTransaction.accountId,
-                                            this.pTransaction.id, val.date, val.period, val.store, val.budget, val.categories)
+                                            this.pTransaction.id, val.date, val.period,
+                                            val.store ? val.store.id : undefined, val.budget, val.categories)
       .subscribe(
-        transactionUpdated => {
+        (transactionUpdated: Transaction) => {
           this.updateTransaction(transactionUpdated);
           this.switchEditionMode(false);
         },
-        error => {
+        (error: string) => {
           this.errorMessage = error;
         }
       );
@@ -110,7 +130,7 @@ export class TransactionComponent implements OnInit {
   resetForm(): void {
     this.formGroup.patchValue({
       period: this.pTransaction.period == null ? null : this.pTransaction.period,
-      store: this.pTransaction.store == null ? null : this.pTransaction.store.id,
+      store: this.pTransaction.store == null ? null : this.pTransaction.store,
       budget: this.pTransaction.budget == null ? null : this.pTransaction.budget.id,
       categories: this.pTransaction.categories == null ? null : this.pTransaction.categories.map((cat) => cat.id),
       date: this.pTransaction.date
@@ -120,5 +140,25 @@ export class TransactionComponent implements OnInit {
   switchEditionMode(mode: boolean): void {
     this.resetForm();
     this.edition = mode;
+  }
+
+  displayStore(store: Store): string {
+    return store ? store.name : '';
+  }
+
+  addStore(): void {
+    const value = this.formGroup.get('store').value;
+    if (value instanceof Store) {
+      return ;
+    } else if (this.allStores != null && this.allStores.find((store: Store) => store.name === value)) {
+      this.errorMessage = 'This store already exists.';
+      return ;
+    } else {
+      this.banksDataService.addStore(value)
+        .subscribe(
+          (newStore: Store) => this.formGroup.patchValue({store: newStore}),
+          (error: string) => this.errorMessage = error
+        );
+    }
   }
 }

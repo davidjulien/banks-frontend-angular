@@ -10,6 +10,8 @@ import { TransactionsListComponent } from '@app/components/transactions-list/tra
 import { AccountComponent } from '@app/components/account/account.component';
 import { AccountsListComponent } from '@app/components/accounts-list/accounts-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
@@ -40,7 +42,8 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatFormFieldModule,
     MatDatepickerModule,
     MatInputModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatAutocompleteModule
   ],
   providers: [MatNativeDateModule, DatePipe],
   bootstrap: [AppComponent]

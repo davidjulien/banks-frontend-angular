@@ -11,7 +11,7 @@
     </div>
 
     <ng-template #forminfo>
-      <form [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value)" class="form extended_info">
+      <form [formGroup]="formGroup" class="form extended_info">
         <mat-form-field>
           <mat-label>Date</mat-label>
           <input id="date" matInput formControlName="date" [matDatepicker]="picker">
@@ -28,9 +28,19 @@
 
         <mat-form-field id="store">
           <mat-label>Store</mat-label>
-          <mat-select formControlName="store">
-            <mat-option *ngFor="let store of pStores$ | async" [(value)]="store.id">{{store.name}}</mat-option>
-          </mat-select>
+          <input type="text"
+                 placeholder="Pick one"
+                 aria-label="Number"
+                 matInput
+                 formControlName="store"
+                 [matAutocomplete]="auto"
+                 (keyup.enter)="addStore()"
+                 >
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayStore">
+            <mat-option *ngFor="let store of pStoresFiltered$ | async" [value]="store">
+              {{store.name}}
+            </mat-option>
+          </mat-autocomplete>
         </mat-form-field>
 
         <mat-form-field>
@@ -47,7 +57,7 @@
           </mat-select>
         </mat-form-field>
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="!formGroup.valid">Update</button>
+        <button mat-raised-button color="primary" type="button" [disabled]="!formGroup.valid" (click)="onSubmit(formGroup.value)">Update</button>
         <button mat-raised-button type="button" class="btn" (click)="switchEditionMode(false)">Cancel</button>
         <div class="error" *ngIf="errorMessage!=null">{{errorMessage}}</div>
       </form>

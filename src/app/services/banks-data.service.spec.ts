@@ -266,5 +266,20 @@ describe('BanksDataService', () => {
     request.error(new ErrorEvent('fail'));
   });
 
+  it('should add a new store', () => {
+    expect(service).toBeTruthy();
 
+    const storeName = 'MyNewStore';
+
+    service.addStore(storeName).subscribe(
+      (data: Store) => expect(data).toEqual(new Store(1000000, storeName)),
+      error => expect(true).toBe(false)
+    );
+
+    // Expect one call to add a store
+    const request = httpMock.expectOne(`${service.API_URL}/stores/new`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual(storeName);
+    request.flush(JSON.parse('{"id":1000000,"name":"' + storeName + '"}'));
+  });
 });

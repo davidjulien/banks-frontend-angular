@@ -78,6 +78,14 @@ export class BanksDataService {
       ));
   }
 
+  addStore(storeName: string): Observable<Store | string> {
+    const body = storeName;
+    return this.http.post(`${this.API_URL}/stores/new`, body).pipe(
+      map((data: any) => new Store(data.id, data.name)),
+      catchError(this.handleError)
+    );
+  }
+
   getAccounts(): Observable<Account[]> {
     return forkJoin([
       this.getBanks(),
@@ -89,7 +97,8 @@ export class BanksDataService {
   }
 
   updateTransaction(bankId: string, clientId: string, accountId: string, transactionId: string,
-                    date: Date, period: string, storeId: number, budgetId: number, categoriesIds: number[]): Observable<any> {
+                    date: Date, period: string, storeId: number, budgetId: number,
+                    categoriesIds: number[]): Observable<Transaction | string> {
     const body = {
       ext_date: this.datepipe.transform(date, 'yyyy-MM-dd'),
       ext_period: period == null ? null : period,

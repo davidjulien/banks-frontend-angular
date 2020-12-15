@@ -11,6 +11,7 @@ import { Budget } from '@app/models/budget.model';
 import { Category } from '@app/models/category.model';
 import { Store } from '@app/models/store.model';
 import { Account, AccountAdapter } from '@app/models/account.model';
+import { Mapping, FixDate } from '@app/models/mapping.model';
 
 @Injectable({
   providedIn: 'root'
@@ -117,6 +118,22 @@ export class BanksDataService {
         this.transactionAdapter.adapt(transaction, allBanks, allBudgets, allCategories, allStores) ),
       catchError(this.handleError)
     );
+  }
+
+  addMapping(pattern: string, storeId: number, budgetId: number, categoriesIds: number[], fixDate: FixDate, period: PeriodType)
+    : Observable<Mapping | string> {
+    const body = {
+      pattern,
+      store_id: storeId,
+      budget_id: budgetId,
+      categories_ids: categoriesIds,
+      fix_date: fixDate,
+      period
+    };
+    return this.http.post(`${this.API_URL}/mappings/new`, body).pipe(
+      map((data: any) => new Mapping(data.pattern),
+      catchError(this.handleError)
+    ));
   }
 
   private handleError(error: HttpErrorResponse): Observable<string> {

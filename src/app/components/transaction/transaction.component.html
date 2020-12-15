@@ -57,8 +57,23 @@
           </mat-select>
         </mat-form-field>
 
-        <button mat-raised-button color="primary" type="button" [disabled]="!formGroup.valid" (click)="onSubmit(formGroup.value)">Update</button>
+        <button mat-raised-button color="primary" id="update" type="button" [disabled]="!formGroup.valid" (click)="onSubmit(formGroup.value)">Update this rule</button>
         <button mat-raised-button type="button" class="btn" (click)="switchEditionMode(false)">Cancel</button>
+
+        <mat-form-field>
+          <mat-label>Fix date (to add mapping)</mat-label>
+          <mat-select formControlName="fixDate">
+            <mat-option *ngFor="let fix of fixDates" [(value)]="fix.id">{{fix.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Pattern (to add mapping)</mat-label>
+          <input matInput formControlName="pattern" class="pattern" placeholder="Pattern (required to add mapping)" required>
+        </mat-form-field>
+
+        <button mat-raised-button id="addMapping" color="primary" type="button" [disabled]="!formGroup.valid" (click)="onAddMapping(formGroup.value)">Add mapping</button>
+
         <div class="error" *ngIf="errorMessage!=null">{{errorMessage}}</div>
       </form>
     </ng-template>

@@ -21,6 +21,13 @@ export class TransactionComponent implements OnInit {
     {id: 'semester', name: 'Semester' },
     {id: 'annual', name: 'Annual' }
   ];
+  readonly fixDates = [ {id: 'previous2', name: 'Two months before' },
+    {id: 'previous', name: 'Previous month' },
+    {id: 'previous_if_begin', name: 'Previous month if begin' },
+    {id: 'none', name: 'Current month' },
+    {id: 'next_if_end', name: 'Next month if end of month' },
+    {id: 'next', name: 'Next month' }
+  ];
 
   pTransaction: Transaction;
   pStores$: Observable<Store[]>;
@@ -66,7 +73,9 @@ export class TransactionComponent implements OnInit {
       period: [null],
       store: storeControl,
       budget: [null],
-      categories: [null]
+      categories: [null],
+      fixDate: [null],
+      pattern: [null]
     });
   }
 
@@ -118,6 +127,18 @@ export class TransactionComponent implements OnInit {
       );
   }
 
+  onAddMapping(val): void {
+    this.banksDataService.addMapping(val.pattern, val.store ? val.store.id : undefined, val.budget, val.categories, val.fixDate, val.period)
+      .subscribe(
+        (mapping) => {
+          this.switchEditionMode(false);
+        },
+        (error: string) => {
+          this.errorMessage = error;
+        }
+      );
+  }
+
   updateTransaction(transactionUpdated: Transaction): void {
     this.pTransaction = transactionUpdated;
     if (this.pTransaction.categories) {
@@ -133,8 +154,19 @@ export class TransactionComponent implements OnInit {
       store: this.pTransaction.store == null ? null : this.pTransaction.store,
       budget: this.pTransaction.budget == null ? null : this.pTransaction.budget.id,
       categories: this.pTransaction.categories == null ? null : this.pTransaction.categories.map((cat) => cat.id),
-      date: this.pTransaction.date
+      date: this.pTransaction.date,
+      fixDate: 'none',
+      pattern: this.descriptionToPattern(this.pTransaction.description)
     });
+  }
+
+  descriptionToPattern(description: string): string {
+    const r = description.match(/^(?:VIREMENT SEPA EMIS VERS|PAIEMENT D'UN|PAIEMENT PAR CARTE ..\/..\/....) (.*)/);
+    if (r && r[1]) {
+      return r[1];
+    } else {
+      return description;
+    }
   }
 
   switchEditionMode(mode: boolean): void {

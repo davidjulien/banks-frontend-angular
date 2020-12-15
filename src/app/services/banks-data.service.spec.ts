@@ -10,17 +10,18 @@ import { Bank } from '@app/models/bank.model';
 import { Budget } from '@app/models/budget.model';
 import { Category } from '@app/models/category.model';
 import { Store } from '@app/models/store.model';
+import { Mapping, FixDate} from '@app/models/mapping.model';
 
 import { Account, AccountOwnership, AccountType } from '@app/models/account.model';
 
 const ALIMENTATION_CATEGORY = new Category(6, 'Alimentation', null);
 
-const TRANSACTION_DATA_STR = '{"id":"T1","bank_id":"ing","client_id":"CLIENT1","account_id":"ACCOUNT1","transaction_id":"TRANSACTION1","accounting_date":"2020-09-24","effective_date":"2020-09-24","amount":-123.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit","ext_date":"2020-09-23","ext_period":"quarter","ext_budget_id":2,"ext_categories_id":[6,7],"ext_store_id":2}';
+const TRANSACTION_DATA_STR = '{"id":"T1","bank_id":"ing","client_id":"CLIENT1","account_id":"ACCOUNT1","transaction_id":"TRANSACTION1","accounting_date":"2020-09-24","effective_date":"2020-09-24","amount":-123.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit","ext_date":"2020-09-23","ext_period":"quarter","ext_budget_id":2,"ext_categories_ids":[6,7],"ext_store_id":2,"ext_mapping_id":24}';
 const TRANSACTION_DATA = JSON.parse(TRANSACTION_DATA_STR);
 
 const TRANSACTION_DATA_EXPECTED = new Transaction('T1', new Bank('ing', 'ING'), 'CLIENT1', 'ACCOUNT1', 'TRANSACTION1',
       new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
-      new Date(Date.UTC(2020, 8, 23)), PeriodType.QUARTER, new Budget(2, 'Courant'),
+      24, new Date(Date.UTC(2020, 8, 23)), PeriodType.QUARTER, new Budget(2, 'Courant'),
       [ALIMENTATION_CATEGORY, new Category(7, 'Supermarché', ALIMENTATION_CATEGORY)], new Store(2, 'Intermarché'));
 
 const TRANSACTIONS_DATA = JSON.parse('{"transactions":[' + TRANSACTION_DATA_STR + '],"next_cursor":"next_cursor","total":5}');
@@ -37,7 +38,7 @@ const TRANSACTIONS_DATA_2_EXPECTED = new TransactionsPage(
   [
     new Transaction('T2', new Bank('ing', 'ING'), 'CLIENT2', 'ACCOUNT2', 'TRANSACTION2',
       new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), -3.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
-      undefined, undefined, undefined, undefined, undefined)
+      undefined, undefined, undefined, undefined, undefined, undefined)
   ],
   null,
   5);
@@ -281,5 +282,35 @@ describe('BanksDataService', () => {
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual(storeName);
     request.flush(JSON.parse('{"id":1000000,"name":"' + storeName + '"}'));
+  });
+
+  it('should add a new mapping rule', () => {
+    expect(service).toBeTruthy();
+
+    const pattern = 'PATTERN';
+    const storeId = 1;
+    const budgetId = 2;
+    const categoriesIds = [3, 4];
+    const fixDate = FixDate.PREVIOUS;
+    const period = PeriodType.QUARTER;
+    const body = {
+      pattern,
+      store_id: storeId,
+      budget_id: budgetId,
+      categories_ids: categoriesIds,
+      fix_date: fixDate,
+      period
+    };
+
+    service.addMapping(pattern, storeId, budgetId, categoriesIds, fixDate, period).subscribe(
+      (data: Mapping) => expect(data).toEqual(new Mapping(pattern)),
+      error => expect(true).toBe(false)
+    );
+
+    // Expect one call to add a mapping
+    const request = httpMock.expectOne(`${service.API_URL}/mappings/new`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual(body);
+    request.flush(JSON.parse('{"id":1000000,"pattern":"PATTERN","fix_date":"previous","period":"quarter","budget_id":1,"categories_ids":[3,4],"store_id":5}'));
   });
 });

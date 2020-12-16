@@ -44,7 +44,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -128,5 +127,8 @@
       }
     }
   },
-  "defaultProject": "banks-frontend-angular"
+  "defaultProject": "banks-frontend-angular",
+  "cli": {
+    "analytics": false
+  }
 }

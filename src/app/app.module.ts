@@ -19,6 +19,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule} from '@angular/material/datepicker';
 import { MatInputModule} from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 
 
@@ -39,6 +40,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     FormsModule,
     ReactiveFormsModule,
     MatSelectModule,
+    MatCheckboxModule,
     MatFormFieldModule,
     MatDatepickerModule,
     MatInputModule,

@@ -7,7 +7,9 @@ import { Store } from '@app/models/store.model';
 import { Budget } from '@app/models/budget.model';
 import { Category } from '@app/models/category.model';
 import { BanksDataService } from '@app/services/banks-data.service';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
+type mode = 'DISPLAY' | 'EDIT' | 'MAPPING';
 
 @Component({
   selector: 'app-transaction',
@@ -37,16 +39,18 @@ export class TransactionComponent implements OnInit {
 
   categoriesText: string;
 
-  edition: boolean;
+  mode: mode;
+
   formGroup: FormGroup;
 
   allStores: Store[] = null;
   errorMessage: string;
+  submitButtonText: string;
 
   constructor(private banksDataService: BanksDataService, private formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
-    this.edition = false;
+    this.mode = 'DISPLAY';
     this.errorMessage = null;
     this.createForm();
   }
@@ -113,30 +117,35 @@ export class TransactionComponent implements OnInit {
   }
 
   onSubmit(val): void {
-    this.banksDataService.updateTransaction(this.pTransaction.bank.id, this.pTransaction.clientId, this.pTransaction.accountId,
-                                            this.pTransaction.id, val.date, val.period,
-                                            val.store ? val.store.id : undefined, val.budget, val.categories)
-      .subscribe(
-        (transactionUpdated: Transaction) => {
-          this.updateTransaction(transactionUpdated);
-          this.switchEditionMode(false);
-        },
-        (error: string) => {
-          this.errorMessage = error;
-        }
-      );
-  }
-
-  onAddMapping(val): void {
-    this.banksDataService.addMapping(val.pattern, val.store ? val.store.id : undefined, val.budget, val.categories, val.fixDate, val.period)
-      .subscribe(
-        (mapping) => {
-          this.switchEditionMode(false);
-        },
-        (error: string) => {
-          this.errorMessage = error;
-        }
-      );
+    switch (this.mode) {
+      case 'EDIT':
+        this.banksDataService.updateTransaction(this.pTransaction.bank.id, this.pTransaction.clientId, this.pTransaction.accountId,
+                                                this.pTransaction.id, val.date, val.period,
+                                                val.store ? val.store.id : undefined, val.budget, val.categories)
+          .subscribe(
+            (transactionUpdated: Transaction) => {
+              this.updateTransaction(transactionUpdated);
+              this.switchMode('DISPLAY');
+            },
+            (error: string) => {
+              this.errorMessage = error;
+            }
+          );
+        break;
+      case 'MAPPING':
+        this.banksDataService.addMapping(val.pattern, val.store ? val.store.id : undefined,
+                                         val.budget, val.categories, val.fixDate, val.period)
+          .subscribe(
+            (mapping) => {
+              this.switchMode('DISPLAY');
+            },
+            (error: string) => {
+              this.errorMessage = error;
+            }
+          );
+        break;
+      default:
+    }
   }
 
   updateTransaction(transactionUpdated: Transaction): void {
@@ -161,7 +170,7 @@ export class TransactionComponent implements OnInit {
   }
 
   descriptionToPattern(description: string): string {
-    const r = description.match(/^(?:VIREMENT SEPA EMIS VERS|PAIEMENT D'UN|PAIEMENT PAR CARTE ..\/..\/....) (.*)/);
+    const r = description.match(/^(?:PRLV SEPA|VIREMENT SEPA EMIS VERS|PAIEMENT D'UN|AVOIR CARTE|PAIEMENT PAR CARTE ..\/..\/....) (.*)/);
     if (r && r[1]) {
       return r[1];
     } else {
@@ -169,9 +178,28 @@ export class TransactionComponent implements OnInit {
     }
   }
 
-  switchEditionMode(mode: boolean): void {
-    this.resetForm();
-    this.edition = mode;
+  enableMapping(event: MatCheckboxChange): void {
+    if (event.checked) {
+      this.switchMode('MAPPING');
+    } else {
+      this.switchMode('EDIT');
+    }
+  }
+
+  switchMode(newMode: mode): void {
+    if (this.mode === 'DISPLAY' && newMode !== 'DISPLAY') {
+      this.resetForm();
+    }
+    if (newMode === 'MAPPING') {
+      this.formGroup.get('fixDate').enable();
+      this.formGroup.get('pattern').enable();
+      this.submitButtonText = 'Add mapping';
+    } else if (newMode === 'EDIT') {
+      this.formGroup.get('fixDate').disable();
+      this.formGroup.get('pattern').disable();
+      this.submitButtonText = 'Update transaction';
+    }
+    this.mode = newMode;
   }
 
   displayStore(store: Store): string {

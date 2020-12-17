@@ -9,6 +9,7 @@ import { MatDatepickerModule} from '@angular/material/datepicker';
 import { MatInputModule} from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { TransactionComponent } from './transaction.component';
 import { Transaction, TransactionType, PeriodType } from '@app/models/transaction.model';
@@ -56,7 +57,7 @@ describe('TransactionComponent', () => {
   let fixture: ComponentFixture<TransactionComponent>;
   let banksDataService;
 
-  function initWithTransactionWithoutExtendedData(transaction: Transaction, editionMode: boolean): void {
+  function initWithTransactionWithoutExtendedData(transaction: Transaction, editionMode: 'DISPLAY' | 'EDIT' | 'MAPPING'): void {
     component.transaction = transaction;
     fixture.detectChanges();
 
@@ -91,7 +92,7 @@ describe('TransactionComponent', () => {
     const formElements = fixture.debugElement.queryAll(By.css('form'));
     expect(formElements.length).toBe(0);
 
-    if (editionMode) {
+    if (editionMode !== 'DISPLAY') {
       // Prepare API data
       component.budgets$ = of(BUDGETS);
       component.categories$ = of(CATEGORIES);
@@ -109,6 +110,21 @@ describe('TransactionComponent', () => {
 
       const extendedInfoElements2 = fixture.debugElement.queryAll(By.css('div.extended_info'));
       expect(extendedInfoElements2.length).toBe(0);
+
+      expect(component.formGroup.controls.fixDate.status).toBe('DISABLED');
+      expect(component.formGroup.controls.pattern.status).toBe('DISABLED');
+
+      if (editionMode === 'MAPPING') {
+        // Click on Add mapping checkbox
+        const addMappingCheckboxes = fixture.debugElement.queryAll(By.css('mat-checkbox input'));
+        expect(addMappingCheckboxes.length).toBe(1);
+        addMappingCheckboxes[0].nativeElement.click();
+        fixture.detectChanges();
+
+        // Verify that input fields are enabled
+        expect(component.formGroup.controls.fixDate.status).toBe('VALID');
+        expect(component.formGroup.controls.pattern.status).toBe('VALID');
+      }
     }
   }
 
@@ -117,7 +133,7 @@ describe('TransactionComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [ FormsModule, ReactiveFormsModule, MatSelectModule, MatFormFieldModule, BrowserAnimationsModule,
-        MatDatepickerModule, MatInputModule, MatNativeDateModule, MatAutocompleteModule ],
+        MatDatepickerModule, MatInputModule, MatNativeDateModule, MatAutocompleteModule, MatCheckboxModule ],
       providers: [ {provide: BanksDataService, useValue: banksDataService}, MatNativeDateModule, FormBuilder ],
       declarations: [ TransactionComponent ]
     })
@@ -200,7 +216,7 @@ describe('TransactionComponent', () => {
   });
 
   it('should display a transaction without extended data, switch to edition mode and cancel', () => {
-    initWithTransactionWithoutExtendedData(transaction1, true);
+    initWithTransactionWithoutExtendedData(transaction1, 'EDIT');
 
     // Click on cancel
     const updateButtons = fixture.debugElement.queryAll(By.css('button[class="btn"]'));
@@ -214,7 +230,7 @@ describe('TransactionComponent', () => {
   });
 
   it('should display a transaction without extended data, switch to edition mode and update', () => {
-    initWithTransactionWithoutExtendedData(transaction1, true);
+    initWithTransactionWithoutExtendedData(transaction1, 'EDIT');
 
     // Update transaction info simulated call
     const updateTransactionSpy = banksDataService.updateTransaction.and.returnValue( of(transaction2) );
@@ -328,7 +344,7 @@ describe('TransactionComponent', () => {
   });
 
   it('should display a transaction without extended data, switch to edition mode and add a new store successfully', () => {
-    initWithTransactionWithoutExtendedData(transaction3, true);
+    initWithTransactionWithoutExtendedData(transaction3, 'EDIT');
 
     // Verify that we have no store
     expect(component.formGroup.value.store).toBe(null);
@@ -349,7 +365,7 @@ describe('TransactionComponent', () => {
   });
 
   it('should display a transaction without extended data, switch to edition mode and adding a new store failed', () => {
-    initWithTransactionWithoutExtendedData(transaction3, true);
+    initWithTransactionWithoutExtendedData(transaction3, 'EDIT');
 
     // Verify that we have no store
     expect(component.formGroup.value.store).toBe(null);
@@ -376,7 +392,7 @@ describe('TransactionComponent', () => {
 
   it('should display a transaction without extended data, switch to edition mode and do not add an already existing store',
     fakeAsync(() => {
-      initWithTransactionWithoutExtendedData(transaction1, true);
+      initWithTransactionWithoutExtendedData(transaction1, 'EDIT');
       tick();
       fixture.detectChanges();
 
@@ -407,7 +423,7 @@ describe('TransactionComponent', () => {
     }));
 
   it('should display a transaction without extended data, switch to edition mode and select a known store', fakeAsync(() => {
-    initWithTransactionWithoutExtendedData(transaction1, true);
+    initWithTransactionWithoutExtendedData(transaction1, 'EDIT');
     tick();
     fixture.detectChanges();
 
@@ -447,7 +463,7 @@ describe('TransactionComponent', () => {
   }));
 
   it('should display a transaction without extended data, switch to edition mode and add mapping', () => {
-    initWithTransactionWithoutExtendedData(transaction3, true);
+    initWithTransactionWithoutExtendedData(transaction3, 'MAPPING');
 
     const inputPattern = component.formGroup.controls.pattern;
     expect(inputPattern.value).toBe('MAGASIN');
@@ -461,7 +477,7 @@ describe('TransactionComponent', () => {
     const addMappingSpy = banksDataService.addMapping.withArgs('AUCHAN', 1, 2, null, 'none', null).and.returnValue( of(MAPPING) );
 
     // Click on add mapping
-    const addButtons = fixture.debugElement.queryAll(By.css('button[id="addMapping"]'));
+    const addButtons = fixture.debugElement.queryAll(By.css('button[id="update"]'));
     expect(addButtons.length).toBe(1);
     addButtons[0].nativeElement.click();
     fixture.detectChanges();
@@ -492,7 +508,7 @@ describe('TransactionComponent', () => {
   });
 
   it('should display a transaction without extended data, switch to edition mode and add mapping failed', () => {
-    initWithTransactionWithoutExtendedData(transaction1, true);
+    initWithTransactionWithoutExtendedData(transaction1, 'MAPPING');
 
     const inputPattern = component.formGroup.controls.pattern;
     inputPattern.setValue('AUCHAN');
@@ -505,7 +521,7 @@ describe('TransactionComponent', () => {
     const addMappingSpy = banksDataService.addMapping.withArgs('AUCHAN', undefined, 2, null, 'none', null).and.returnValue( throwError('Invalid parameters') );
 
     // Click on add mapping
-    const addButtons = fixture.debugElement.queryAll(By.css('button[id="addMapping"]'));
+    const addButtons = fixture.debugElement.queryAll(By.css('button[id="update"]'));
     expect(addButtons.length).toBe(1);
     addButtons[0].nativeElement.click();
     fixture.detectChanges();

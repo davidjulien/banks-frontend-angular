@@ -21,12 +21,6 @@ export class PaginatedData<T> {
 export class InfiniteScrollDataAdapter implements Subscribable<any>{
   pDataSource$: Observable<any>;
 
-  // Current cursor as observable
-  private pCursor$ = new BehaviorSubject(null);
-
-  // Current limit as observable
-  private limit$: BehaviorSubject<any>;
-
   // Loading state as observable
   public loading$ = new BehaviorSubject(false);
 
@@ -36,18 +30,14 @@ export class InfiniteScrollDataAdapter implements Subscribable<any>{
   // Total Count Observable
   public totalCount$ = new BehaviorSubject(0);
 
+  // Current cursor as observable
+  private pCursor$ = new BehaviorSubject(null);
+
+  // Current limit as observable
+  private limit$: BehaviorSubject<any>;
+
   // Cursor for next API call
   private nextCursor: string;
-
-  subscribe(observer?: PartialObserver<any>): Unsubscribable;
-  subscribe(next: null | undefined | ((value: any) => void), error: null | undefined, complete: () => void): Unsubscribable;
-  subscribe(next: null | undefined, error: (error: any) => void, complete?: () => void): Unsubscribable;
-  subscribe(next?: (value: any) => void, error?: (error: any) => void, complete?: () => void): Unsubscribable;
-  subscribe(
-    observer?: PartialObserver<any> | null | undefined | ((value: any) => void), error?: null | undefined | ((error: any) => void),
-    complete?: () => void): Unsubscribable {
-    return this.pDataSource$.subscribe(...arguments);
-  }
 
   /***
    *
@@ -89,6 +79,16 @@ export class InfiniteScrollDataAdapter implements Subscribable<any>{
         // Turn off loading
         tap(() => this.loading$.next(false))
       );
+  }
+
+  subscribe(observer?: PartialObserver<any>): Unsubscribable;
+  subscribe(next: null | undefined | ((value: any) => void), error: null | undefined, complete: () => void): Unsubscribable;
+  subscribe(next: null | undefined, error: (error: any) => void, complete?: () => void): Unsubscribable;
+  subscribe(next?: (value: any) => void, error?: (error: any) => void, complete?: () => void): Unsubscribable;
+  subscribe(
+    observer?: PartialObserver<any> | null | undefined | ((value: any) => void), error?: null | undefined | ((error: any) => void),
+    complete?: () => void): Unsubscribable {
+    return this.pDataSource$.subscribe(...arguments);
   }
 
   /**

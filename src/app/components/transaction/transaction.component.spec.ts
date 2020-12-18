@@ -47,17 +47,17 @@ const transaction3 = new Transaction('T1', new Bank('ing', 'ING'), 'CLIENT', 'AC
   new Date(2020, 0, 24), new Date(2020, 3, 24), 123.45, 'VIREMENT SEPA EMIS VERS MAGASIN', TransactionType.SEPA_DEBIT,
   undefined, undefined, undefined, undefined, undefined, undefined);
 
-function generateKeyUpEvent(value: string): KeyboardEvent {
+const generateKeyUpEvent = (value: string): KeyboardEvent => {
   const event: KeyboardEvent = new KeyboardEvent('keyup', { bubbles: true, cancelable: true, key: value });
   return event;
-}
+};
 
 describe('TransactionComponent', () => {
   let component: TransactionComponent;
   let fixture: ComponentFixture<TransactionComponent>;
   let banksDataService;
 
-  function initWithTransactionWithoutExtendedData(transaction: Transaction, editionMode: 'DISPLAY' | 'EDIT' | 'MAPPING'): void {
+  const initWithTransactionWithoutExtendedData = (transaction: Transaction, editionMode: 'DISPLAY' | 'EDIT' | 'MAPPING'): void => {
     component.transaction = transaction;
     fixture.detectChanges();
 
@@ -126,7 +126,7 @@ describe('TransactionComponent', () => {
         expect(component.formGroup.controls.pattern.status).toBe('VALID');
       }
     }
-  }
+  };
 
   beforeEach(async () => {
     banksDataService = jasmine.createSpyObj('BanksDataService', ['updateTransaction', 'addStore', 'addMapping']);

@@ -120,8 +120,7 @@ export class BanksDataService {
     );
   }
 
-  addMapping(pattern: string, storeId: number, budgetId: number, categoriesIds: number[], fixDate: FixDate, period: PeriodType)
-    : Observable<Mapping | string> {
+  addMapping(pattern: string, storeId: number, budgetId: number, categoriesIds: number[], fixDate: FixDate, period: PeriodType): Observable<Mapping | string> {
     const body = {
       pattern,
       store_id: storeId,

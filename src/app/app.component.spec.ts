@@ -52,7 +52,8 @@ describe('AppComponent', () => {
   let banksDataService;
 
   beforeEach(async () => {
-    banksDataService = jasmine.createSpyObj('BanksDataService', ['getTransactionsPage', 'getAccounts', 'getBudgets', 'getCategories', 'getStores']);
+    banksDataService = jasmine.createSpyObj('BanksDataService',
+      ['getTransactionsPage', 'getAccounts', 'getBudgets', 'getCategories', 'getStores']);
 
     await TestBed.configureTestingModule({
       imports: [

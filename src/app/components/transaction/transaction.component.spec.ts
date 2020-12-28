@@ -36,16 +36,16 @@ const MAPPING = new Mapping('PATTERN');
 // Date month starts at 0
 const transaction1 = new Transaction('T1', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTIONID',
   new Date(2020, 0, 24), new Date(2020, 3, 24), 123.45, 'PAIEMENT PAR CARTE', TransactionType.CARD_DEBIT,
-  undefined, undefined, undefined, undefined, undefined, undefined);
+  null, null, null, null, null, null, false, null);
 
 const transaction2 = new Transaction('T1', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTIONID',
   new Date(2020, 0, 24), new Date(2020, 3, 24), 123.45, 'PAIEMENT PAR CARTE', TransactionType.CARD_DEBIT,
   24, new Date(2020, 0, 20), PeriodType.MONTH, new Budget(1, 'Courant'), [CAT_ALIMENTATION, CAT_SUPERMARCHE],
-  new Store(6, 'MONSUPERMARCHE'));
+  new Store(6, 'MONSUPERMARCHE'), false, null);
 
 const transaction3 = new Transaction('T1', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTIONID',
   new Date(2020, 0, 24), new Date(2020, 3, 24), 123.45, 'VIREMENT SEPA EMIS VERS MAGASIN', TransactionType.SEPA_DEBIT,
-  undefined, undefined, undefined, undefined, undefined, undefined);
+  null, null, null, null, null, null, false, null);
 
 const generateKeyUpEvent = (value: string): KeyboardEvent => {
   const event: KeyboardEvent = new KeyboardEvent('keyup', { bubbles: true, cancelable: true, key: value });
@@ -518,7 +518,7 @@ describe('TransactionComponent', () => {
     inputBudget.setValue(BUDGETS[1].id);
 
     // Add mapping simulated call
-    const addMappingSpy = banksDataService.addMapping.withArgs('AUCHAN', undefined, 2, null, 'none', null).and.returnValue( throwError('Invalid parameters') );
+    const addMappingSpy = banksDataService.addMapping.withArgs('AUCHAN', null, 2, null, 'none', null).and.returnValue( throwError('Invalid parameters') );
 
     // Click on add mapping
     const addButtons = fixture.debugElement.queryAll(By.css('button[id="update"]'));

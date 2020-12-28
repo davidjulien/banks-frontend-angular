@@ -79,7 +79,8 @@ export class TransactionComponent implements OnInit {
       budget: [null],
       categories: [null],
       fixDate: [null],
-      pattern: [null]
+      pattern: [null],
+      amount: [null]
     });
   }
 
@@ -116,12 +117,32 @@ export class TransactionComponent implements OnInit {
       ));
   }
 
+  onSplit(): void {
+    let transactionId;
+    if (this.pTransaction.id.endsWith('-REM')) {
+      transactionId = this.pTransaction.id.substring(0, this.pTransaction.id.length-1-4);
+    } else {
+      transactionId = this.pTransaction.id;
+    }
+    this.banksDataService.splitTransaction(this.pTransaction.bank.id, this.pTransaction.clientId, this.pTransaction.accountId, transactionId)
+      .subscribe(
+        (transactions: Transaction[]) => {
+          this.updateTransaction(transactions[0]);
+        },
+        (error: string) => {
+          this.errorMessage = error;
+        }
+      );
+  }
+
   onSubmit(val): void {
     switch (this.mode) {
       case 'EDIT':
+        console.log(val);
+        const amount = (val.amount === '' || val.amount === null) ? null: parseFloat(val.amount);
         this.banksDataService.updateTransaction(this.pTransaction.bank.id, this.pTransaction.clientId, this.pTransaction.accountId,
                                                 this.pTransaction.id, val.date, val.period,
-                                                val.store ? val.store.id : undefined, val.budget, val.categories)
+                                                val.store ? val.store.id : null, val.budget, val.categories, amount)
           .subscribe(
             (transactionUpdated: Transaction) => {
               this.updateTransaction(transactionUpdated);
@@ -133,8 +154,7 @@ export class TransactionComponent implements OnInit {
           );
         break;
       case 'MAPPING':
-        this.banksDataService.addMapping(val.pattern, val.store ? val.store.id : undefined,
-                                         val.budget, val.categories, val.fixDate, val.period)
+        this.banksDataService.addMapping(val.pattern, val.store ? val.store.id : null, val.budget, val.categories, val.fixDate, val.period)
           .subscribe(
             (mapping) => {
               this.switchMode('DISPLAY');
@@ -164,6 +184,7 @@ export class TransactionComponent implements OnInit {
       budget: this.pTransaction.budget == null ? null : this.pTransaction.budget.id,
       categories: this.pTransaction.categories == null ? null : this.pTransaction.categories.map((cat) => cat.id),
       date: this.pTransaction.date,
+      amount: this.pTransaction.splitOfId && !this.pTransaction.id.endsWith('-REM') ? this.pTransaction.amount : null,
       fixDate: 'none',
       pattern: this.descriptionToPattern(this.pTransaction.description)
     });

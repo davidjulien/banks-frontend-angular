@@ -83,7 +83,7 @@ export class BanksDataService {
     const body = storeName;
     return this.http.post(`${this.API_URL}/stores/new`, body).pipe(
       map((data: any) => new Store(data.id, data.name)),
-      catchError(this.handleError)
+      catchError((error) => this.handleError(error, 'Unable to add store.'))
     );
   }
 
@@ -99,13 +99,14 @@ export class BanksDataService {
 
   updateTransaction(bankId: string, clientId: string, accountId: string, transactionId: string,
                     date: Date, period: string, storeId: number, budgetId: number,
-                    categoriesIds: number[]): Observable<Transaction | string> {
+                    categoriesIds: number[], amount: number): Observable<Transaction | string> {
     const body = {
       ext_date: this.datepipe.transform(date, 'yyyy-MM-dd'),
       ext_period: period == null ? null : period,
       ext_store_id: storeId,
       ext_budget_id: budgetId,
-      ext_categories_ids: categoriesIds
+      ext_categories_ids: categoriesIds,
+      amount
     };
     return forkJoin([
       this.getBanks(),
@@ -116,7 +117,22 @@ export class BanksDataService {
     ]).pipe(
       map(([allBanks, allBudgets, allCategories, allStores, transaction]) =>
         this.transactionAdapter.adapt(transaction, allBanks, allBudgets, allCategories, allStores) ),
-      catchError(this.handleError)
+      catchError((error) => this.handleError(error, 'Unable to update transaction info.'))
+    );
+  }
+
+  splitTransaction(bankId: string, clientId: string, accountId: string, transactionId: string): Observable<Transaction[] | string> {
+    return forkJoin([
+      this.getBanks(),
+      this.getBudgets(),
+      this.getCategories(),
+      this.getStores(),
+      this.http.post(`${this.API_URL}/transactions/${bankId}/${clientId}/${accountId}/${transactionId}/split`, '')
+    ]).pipe(
+      map(([allBanks, allBudgets, allCategories, allStores, transactions]) =>
+        (transactions as any[]).map((tr: any) => this.transactionAdapter.adapt(tr, allBanks, allBudgets, allCategories, allStores))
+      ),
+      catchError((error) => this.handleError(error, 'Unable to split transaction.'))
     );
   }
 
@@ -131,11 +147,11 @@ export class BanksDataService {
     };
     return this.http.post(`${this.API_URL}/mappings/new`, body).pipe(
       map((data: any) => new Mapping(data.pattern),
-      catchError(this.handleError)
+      catchError((error) => this.handleError(error, 'Unable to add mapping.'))
     ));
   }
 
-  private handleError(error: HttpErrorResponse): Observable<string> {
+  private handleError(error: HttpErrorResponse, message: string): Observable<string> {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
       console.error('An error occurred:', error.error.message);
@@ -147,6 +163,6 @@ export class BanksDataService {
         `body was: ${error.error}`);
     }
     // Return an observable with a user-facing error message.
-    return throwError('Unable to update transaction info.');
+    return throwError(message);
   }
 }

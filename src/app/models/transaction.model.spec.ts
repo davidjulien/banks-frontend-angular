@@ -22,9 +22,11 @@ describe('Transaction', () => {
     const budget = new Budget(2, 'Courant');
     const categories = [new Category(1, 'Alimentation', null)];
     const store = new Store(1, 'SUPERMARCHE');
+    const splitted = false;
+    const splitOfId = null;
     const transaction = new Transaction(id, bank, clientId, accountId, transactionId,
       accountingDate, effectiveDate, amount, description, transactionType,
-      mappingId, date, period, budget, categories, store
+      mappingId, date, period, budget, categories, store, splitted, splitOfId
     );
     expect(transaction).toBeTruthy();
     expect(transaction.bank).toBe(bank);

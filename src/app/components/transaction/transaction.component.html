@@ -1,13 +1,14 @@
 <div id="{{pTransaction.id}}" class="transaction">
-  <div class="amount {{ pTransaction.amount > 0 ? 'credit' : 'debit' }}">{{ pTransaction.amount }} €</div>
+  <div class="amount {{ pTransaction.amount > 0 ? 'credit' : 'debit' }}">{{ pTransaction.amount | number : '1.2-2' }} €</div>
 
   <div class="info">
     <div class="extended_info" *ngIf="mode==='DISPLAY'; else forminfo" novalidate (click)="switchMode('EDIT')">
-      <div class="store {{pTransaction.store == undefined ? 'missing' : ''}}">{{ pTransaction.store == undefined ? "(no store)" : pTransaction.store.name }}</div>
-      <div class="date {{pTransaction.date == undefined ? 'missing' : ''}}">{{ pTransaction.date == undefined ? "(no date)" : pTransaction.date| date: "yyyy/MM/dd" }}</div>
-      <div class="period {{pTransaction.period == undefined ? 'missing' : ''}}">{{ pTransaction.period == undefined ? "(no period)" : pTransaction.period }}</div>
-      <div class="budget {{pTransaction.budget == undefined ? 'missing' : ''}}">{{ pTransaction.budget == undefined ? "(no budget)" : pTransaction.budget.name }}</div>
-      <div class="categories {{pTransaction.categories == undefined ? 'missing' : ''}}">{{ categoriesText }}</div>
+      <div class="store {{pTransaction.store == null ? 'missing' : ''}}">{{ pTransaction.store == null ? "(no store)" : pTransaction.store.name }}</div>
+      <div class="date {{pTransaction.date == null ? 'missing' : ''}}">{{ pTransaction.date == null ? "(no date)" : pTransaction.date| date: "yyyy/MM/dd" }}</div>
+      <div class="period {{pTransaction.period == null ? 'missing' : ''}}">{{ pTransaction.period == null ? "(no period)" : pTransaction.period }}</div>
+      <div class="budget {{pTransaction.budget == null ? 'missing' : ''}}">{{ pTransaction.budget == null ? "(no budget)" : pTransaction.budget.name }}</div>
+      <div class="categories {{pTransaction.categories == null ? 'missing' : ''}}">{{ categoriesText }}</div>
+      <button *ngIf="pTransaction.splitOfId === null || pTransaction.id.endsWith('-REM')" mat-raised-button color="primary" id="update" type="button" (click)="onSplit()">Split</button>
     </div>
 
     <ng-template #forminfo>
@@ -57,7 +58,8 @@
           </mat-select>
         </mat-form-field>
 
-        <section>
+        <section *ngIf="pTransaction.splitOfId === null">
+          <!-- Add mapping is available for main transaction -->
           <mat-checkbox (change)="enableMapping($event)">Add mapping</mat-checkbox>
 
           <mat-form-field>
@@ -73,10 +75,18 @@
           </mat-form-field>
         </section>
 
+        <ng-template [ngIf]="pTransaction.splitOfId && !pTransaction.id.endsWith('-REM')">
+          <!-- Amount may be updated in case of subtransaction (except for the remaining subtransaction which is automatically computed from other subtransactions) -->
+          <mat-form-field>
+            <mat-label>Amount</mat-label>
+            <input type="text" aria-label="Amount" matInput formControlName="amount">
+          </mat-form-field>
+        </ng-template>
+
         <button mat-raised-button color="primary" id="update" type="button" [disabled]="!formGroup.valid" (click)="onSubmit(formGroup.value)">{{submitButtonText}}</button>
         <button mat-raised-button type="button" class="btn" (click)="switchMode('DISPLAY')">Cancel</button>
 
-        <div class="error" *ngIf="errorMessage!=null">{{errorMessage}}</div>
+        <div class="clearfix error" *ngIf="errorMessage!=null">{{errorMessage}}</div>
       </form>
     </ng-template>
 

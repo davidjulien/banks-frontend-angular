@@ -41,7 +41,9 @@ export class Transaction {
     public readonly period: PeriodType,
     public readonly budget: Budget,
     public readonly categories: Category[],
-    public readonly store: Store) {
+    public readonly store: Store,
+    public readonly splitted: boolean,
+    public readonly splitOfId: string) {
   }
 }
 
@@ -54,15 +56,15 @@ export class TransactionAdapter {
   adapt(item: any, allBanks: Bank[], allBudgets: Budget[], allCategories: Category[], allStores: Store[]): Transaction {
     const bank: Bank = allBanks.find((aBank) => aBank.id === item.bank_id);
     const budget: Budget = allBudgets.find((aBudget) => aBudget.id === item.ext_budget_id);
-    const categories: Category[] = item.ext_categories_ids === null || item.ext_categories_ids === undefined ? undefined :
-      item.ext_categories_ids.map((categoryId) => allCategories.find((aCategory) => aCategory.id === categoryId));
-    const store: Store = allStores.find((aStore) => aStore.id === item.ext_store_id);
-    const period: PeriodType = item.ext_period === null || item.ext_period === undefined ?
-      undefined : PeriodType[item.ext_period.toUpperCase() as keyof typeof PeriodType];
+    const categories: Category[] = item.ext_categories_ids === null
+      ? null : item.ext_categories_ids.map((categoryId) => allCategories.find((aCategory) => aCategory.id === categoryId));
+    const store: Store = item.ext_store_id === null ? null : allStores.find((aStore) => aStore.id === item.ext_store_id);
+    const period: PeriodType = item.ext_period === null ? null : PeriodType[item.ext_period.toUpperCase() as keyof typeof PeriodType];
+    const splitOfId = item.ext_split_of_id === null ? null : item.ext_split_of_id;
     return new Transaction(item.id, bank, item.client_id, item.account_id,
       item.transaction_id, new Date(item.accounting_date), new Date(item.effective_date),
       item.amount, item.description, TransactionType[item.type.toUpperCase() as keyof typeof TransactionType],
-      item.ext_mapping_id, item.ext_date === null || item.ext_date === undefined ? undefined : new Date(item.ext_date),
-      period, budget, categories, store);
+      item.ext_mapping_id, item.ext_date === null ? null : new Date(item.ext_date),
+      period, budget, categories, store, item.ext_splitted, splitOfId);
   }
 }

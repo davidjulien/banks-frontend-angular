@@ -36,10 +36,10 @@ const TRANSACTIONS_PAGE_1 = new TransactionsPage(
   [
     new Transaction('T1', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION1',
       new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
-      null, null, null, null, null, null, false, null),
+      null, null, null, null, null, null, false, null, false),
     new Transaction('T2', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION2',
       new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), 56.78, 'VIREMENT', TransactionType.TRANSFER,
-      null, null, null, null, null, null, false, null)
+      null, null, null, null, null, null, false, null, false)
   ],
   'next_cursor',
   4);
@@ -48,10 +48,10 @@ const TRANSACTIONS_PAGE_2 = new TransactionsPage(
   [
     new Transaction('T3', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION3',
       new Date(Date.UTC(2020, 8, 22)), new Date(Date.UTC(2020, 8, 22)), -3.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
-      null, null, null, null, null, null, false, null),
+      null, null, null, null, null, null, false, null, false),
     new Transaction('T4', new Bank('ing', 'ING'), 'CLIENT', 'ACCOUNT', 'TRANSACTION4',
       new Date(Date.UTC(2020, 8, 21)), new Date(Date.UTC(2020, 8, 21)), 5.8, 'VIREMENT', TransactionType.TRANSFER,
-      null, null, null, null, null, null, false, null)
+      null, null, null, null, null, null, false, null, false)
   ],
   null,
   4);

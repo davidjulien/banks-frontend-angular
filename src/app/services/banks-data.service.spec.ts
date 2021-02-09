@@ -1,5 +1,6 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { DatePipe } from '@angular/common';
+
 import { HttpClientModule } from '@angular/common/http';
 import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -16,13 +17,13 @@ import { Account, AccountOwnership, AccountType } from '@app/models/account.mode
 
 const ALIMENTATION_CATEGORY = new Category(6, 'Alimentation', null);
 
-const TRANSACTION_DATA_STR = '{"id":"T1","bank_id":"ing","client_id":"CLIENT1","account_id":"ACCOUNT1","transaction_id":"TRANSACTION1","accounting_date":"2020-09-24","effective_date":"2020-09-24","amount":-123.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit","ext_date":"2020-09-23","ext_period":"quarter","ext_budget_id":2,"ext_categories_ids":[6,7],"ext_store_id":2,"ext_mapping_id":24,"ext_splitted":false,"ext_split_of_id":null}';
+const TRANSACTION_DATA_STR = '{"id":"T1","bank_id":"ing","client_id":"CLIENT1","account_id":"ACCOUNT1","transaction_id":"TRANSACTION1","accounting_date":"2020-09-24","effective_date":"2020-09-24","amount":-123.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit","ext_date":"2020-09-23","ext_period":"quarter","ext_budget_id":2,"ext_categories_ids":[6,7],"ext_store_id":2,"ext_mapping_id":24,"ext_splitted":false,"ext_split_of_id":null,"ext_to_purse":false}';
 const TRANSACTION_DATA = JSON.parse(TRANSACTION_DATA_STR);
 
 const TRANSACTION_DATA_EXPECTED = new Transaction('T1', new Bank('ing', 'ING'), 'CLIENT1', 'ACCOUNT1', 'TRANSACTION1',
       new Date(Date.UTC(2020, 8, 24)), new Date(Date.UTC(2020, 8, 24)), -123.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
       24, new Date(Date.UTC(2020, 8, 23)), PeriodType.QUARTER, new Budget(2, 'Courant'),
-      [ALIMENTATION_CATEGORY, new Category(7, 'Supermarché', ALIMENTATION_CATEGORY)], new Store(2, 'Intermarché'), false, null);
+      [ALIMENTATION_CATEGORY, new Category(7, 'Supermarché', ALIMENTATION_CATEGORY)], new Store(2, 'Intermarché'), false, null, false);
 
 const TRANSACTIONS_DATA = JSON.parse('{"transactions":[' + TRANSACTION_DATA_STR + '],"next_cursor":"next_cursor","total":5}');
 // Date month starts at 0...
@@ -33,12 +34,12 @@ const TRANSACTIONS_DATA_EXPECTED = new TransactionsPage(
   'next_cursor',
   5);
 
-const TRANSACTIONS_DATA_2 = JSON.parse('{"transactions":[{"id":"T2","bank_id":"ing","client_id":"CLIENT2","account_id":"ACCOUNT2","transaction_id":"TRANSACTION2","accounting_date":"2020-09-23","effective_date":"2020-09-23","amount":-3.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit","ext_splitted":false,"ext_split_of_id":null}],"next_cursor":null,"total":5}');
+const TRANSACTIONS_DATA_2 = JSON.parse('{"transactions":[{"id":"T2","bank_id":"ing","client_id":"CLIENT2","account_id":"ACCOUNT2","transaction_id":"TRANSACTION2","accounting_date":"2020-09-23","effective_date":"2020-09-23","amount":-3.45,"description":"PAIEMENT PAR CARTE","type":"sepa_debit","ext_date":null,"ext_categories_ids":[],"ext_period":null,"ext_store_id":null,"ext_mapping_id":null,"ext_budget_id":null,"ext_splitted":false,"ext_split_of_id":null,"ext_to_purse":false}],"next_cursor":null,"total":5}');
 const TRANSACTIONS_DATA_2_EXPECTED = new TransactionsPage(
   [
     new Transaction('T2', new Bank('ing', 'ING'), 'CLIENT2', 'ACCOUNT2', 'TRANSACTION2',
       new Date(Date.UTC(2020, 8, 23)), new Date(Date.UTC(2020, 8, 23)), -3.45, 'PAIEMENT PAR CARTE', TransactionType.SEPA_DEBIT,
-      null, null, null, null, null, null, false, null)
+      null, null, null, null, [], null, false, null, false)
   ],
   null,
   5);
@@ -269,6 +270,40 @@ describe('BanksDataService', () => {
     const mockErrorResponse = { status: 400, statusText: 'Bad Request' };
     request.error(new ErrorEvent('fail'));
   });
+
+  it('should copy a transaction to purse', () => {
+    const bankId = 'ing';
+    const clientId = 'CLIENT1';
+    const accountId = 'ACCOUNT1';
+    const transactionId = 'TRANSACTION1';
+    const date = new Date(2020, 8, 23);
+    const period = PeriodType.QUARTER;
+    const storeId = 2;
+    const budgetId = 2;
+    const categoriesIds = [6, 7];
+
+    expect(service).toBeTruthy();
+
+    service.copyToPurse(bankId, clientId, accountId, transactionId)
+      .subscribe(
+        (data: Transaction[]) => {
+          expect(data).toEqual([TRANSACTION_DATA_EXPECTED]);
+        },
+        error => expect(true).toBe(false)
+      );
+
+    // Expected calls
+    httpMock.expectOne(`${service.API_URL}/banks`).flush(BANKS_DATA);
+    httpMock.expectOne(`${service.API_URL}/budgets`).flush(BUDGETS_DATA);
+    httpMock.expectOne(`${service.API_URL}/categories`).flush(CATEGORIES_DATA);
+    httpMock.expectOne(`${service.API_URL}/stores`).flush(STORES_DATA);
+
+    const request = httpMock.expectOne(`${service.API_URL}/transactions/${bankId}/${clientId}/${accountId}/${transactionId}/copy_to_purse`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual('');
+    request.flush([TRANSACTION_DATA]);
+  });
+
 
   it('should split a transaction and return splitted transaction', () => {
     const bankId = 'ing';

@@ -8,7 +8,8 @@
       <div class="period {{pTransaction.period == null ? 'missing' : ''}}">{{ pTransaction.period == null ? "(no period)" : pTransaction.period }}</div>
       <div class="budget {{pTransaction.budget == null ? 'missing' : ''}}">{{ pTransaction.budget == null ? "(no budget)" : pTransaction.budget.name }}</div>
       <div class="categories {{pTransaction.categories == null ? 'missing' : ''}}">{{ categoriesText }}</div>
-      <button *ngIf="pTransaction.splitOfId === null || pTransaction.id.endsWith('-REM')" mat-raised-button color="primary" id="update" type="button" (click)="onSplit()">Split</button>
+      <button *ngIf="pTransaction.splitOfId === null || pTransaction.id.endsWith('-REM')" mat-raised-button color="primary" id="split" type="button" (click)="onSplit()">Split</button>
+      <button *ngIf="pTransaction.toPurse" mat-raised-button color="primary" id="copytopurse" type="button" (click)="onCopyToPurse()">Copy to purse</button>
     </div>
 
     <ng-template #forminfo>

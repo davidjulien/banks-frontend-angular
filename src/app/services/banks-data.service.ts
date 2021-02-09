@@ -136,6 +136,21 @@ export class BanksDataService {
     );
   }
 
+  copyToPurse(bankId: string, clientId: string, accountId: string, transactionId: string): Observable<Transaction[] | string> {
+    return forkJoin([
+      this.getBanks(),
+      this.getBudgets(),
+      this.getCategories(),
+      this.getStores(),
+      this.http.post(`${this.API_URL}/transactions/${bankId}/${clientId}/${accountId}/${transactionId}/copy_to_purse`, '')
+    ]).pipe(
+      map(([allBanks, allBudgets, allCategories, allStores, transactions]) =>
+        (transactions as any[]).map((tr: any) => this.transactionAdapter.adapt(tr, allBanks, allBudgets, allCategories, allStores))
+      ),
+      catchError((error) => this.handleError(error, 'Unable to copy transaction to purse.'))
+    );
+  }
+
   addMapping(pattern: string, storeId: number, budgetId: number, categoriesIds: number[], fixDate: FixDate, period: PeriodType): Observable<Mapping | string> {
     const body = {
       pattern,

@@ -43,7 +43,9 @@ export class Transaction {
     public readonly categories: Category[],
     public readonly store: Store,
     public readonly splitted: boolean,
-    public readonly splitOfId: string) {
+    public readonly splitOfId: string,
+    public readonly toPurse: boolean
+  ) {
   }
 }
 
@@ -55,7 +57,7 @@ export class TransactionAdapter {
 
   adapt(item: any, allBanks: Bank[], allBudgets: Budget[], allCategories: Category[], allStores: Store[]): Transaction {
     const bank: Bank = allBanks.find((aBank) => aBank.id === item.bank_id);
-    const budget: Budget = allBudgets.find((aBudget) => aBudget.id === item.ext_budget_id);
+    const budget: Budget = item.ext_budget_id === null ? null : allBudgets.find((aBudget) => aBudget.id === item.ext_budget_id);
     const categories: Category[] = item.ext_categories_ids === null
       ? null : item.ext_categories_ids.map((categoryId) => allCategories.find((aCategory) => aCategory.id === categoryId));
     const store: Store = item.ext_store_id === null ? null : allStores.find((aStore) => aStore.id === item.ext_store_id);
@@ -65,6 +67,6 @@ export class TransactionAdapter {
       item.transaction_id, new Date(item.accounting_date), new Date(item.effective_date),
       item.amount, item.description, TransactionType[item.type.toUpperCase() as keyof typeof TransactionType],
       item.ext_mapping_id, item.ext_date === null ? null : new Date(item.ext_date),
-      period, budget, categories, store, item.ext_splitted, splitOfId);
+      period, budget, categories, store, item.ext_splitted, splitOfId, item.ext_to_purse);
   }
 }

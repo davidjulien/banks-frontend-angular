@@ -24,9 +24,10 @@ describe('Transaction', () => {
     const store = new Store(1, 'SUPERMARCHE');
     const splitted = false;
     const splitOfId = null;
+    const pursable = false;
     const transaction = new Transaction(id, bank, clientId, accountId, transactionId,
       accountingDate, effectiveDate, amount, description, transactionType,
-      mappingId, date, period, budget, categories, store, splitted, splitOfId
+      mappingId, date, period, budget, categories, store, splitted, splitOfId, pursable
     );
     expect(transaction).toBeTruthy();
     expect(transaction.bank).toBe(bank);

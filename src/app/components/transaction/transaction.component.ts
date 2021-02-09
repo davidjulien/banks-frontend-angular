@@ -135,10 +135,21 @@ export class TransactionComponent implements OnInit {
       );
   }
 
+  onCopyToPurse(): void {
+    this.banksDataService.copyToPurse(this.pTransaction.bank.id, this.pTransaction.clientId, this.pTransaction.accountId, this.pTransaction.id)
+      .subscribe(
+        (transactions: Transaction[]) => {
+          this.updateTransaction(transactions[0]);
+        },
+        (error: string) => {
+          this.errorMessage = error;
+        }
+      );
+  }
+
   onSubmit(val): void {
     switch (this.mode) {
       case 'EDIT':
-        console.log(val);
         const amount = (val.amount === '' || val.amount === null) ? null: parseFloat(val.amount);
         this.banksDataService.updateTransaction(this.pTransaction.bank.id, this.pTransaction.clientId, this.pTransaction.accountId,
                                                 this.pTransaction.id, val.date, val.period,

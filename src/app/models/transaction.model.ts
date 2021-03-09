@@ -13,6 +13,7 @@ export enum TransactionType {
     TRANSFER,
     INTERESTS,
     BANKS_FEES,
+    STOCK,
     OTHER
 }
 

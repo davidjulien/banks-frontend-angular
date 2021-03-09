@@ -11,7 +11,9 @@ export enum AccountOwnership {
 export enum AccountType {
   CURRENT = 0,
     SAVINGS,
-    HOME_LOAN
+    HOME_LOAN,
+    PURSE,
+    MARKETS
 }
 
 export class Account {
